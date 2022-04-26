@@ -2,8 +2,8 @@ TARGETNAME=native
 TARGETTYPE=PROGRAM
 UMTYPE=nt
 
-
-INCLUDES=$(DDK_INC_PATH)
+MINWIN_SDK_LIB_PATH=$(SDK_LIB_PATH)
+INCLUDES=$(DDK_INC_PATH);./ndk
 
 SOURCES=display.c  \
         file.c     \
@@ -18,3 +18,9 @@ SOURCES=display.c  \
     ntreg.c
 
 PRECOMPILED_INCLUDE=precomp.h
+
+TARGETLIBS= \
+$(DDK_LIB_PATH)\ntdll.lib \
+$(DDK_LIB_PATH)\nt.lib
+
+USE_NTDLL=1
