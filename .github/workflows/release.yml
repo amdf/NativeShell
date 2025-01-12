@@ -55,7 +55,7 @@ jobs:
           prerelease: false
           release_name: Release ${{ github.ref }}
           tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
+          body: NT Native Executable and install files
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Upload release artifact
