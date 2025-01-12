@@ -12,12 +12,12 @@ jobs:
     - name: Install 7zip
       run: choco install 7zip
     - name: Unpack ISO
-      run: 7z.exe x -y -o"C:\wdk" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
+      run: 7z.exe x -y -o"${{ github.workspace }}\wdk" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
     - name: Setup WDK 7.1.0
-      run: |
-          cd C:\wdk 
-          C:\wdk\KitSetup.exe /install ALL /ui-level EXPRESS
+      run: ${{ github.workspace }}\wdk\KitSetup.exe /no-view /log-to-console /install ALL /ui-level EXPRESS
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Build project
-      run: cmd /c "C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP && cd ${{ github.workspace }} && build /g /w"
+      run: |
+        ls C:\WinDDK
+        cmd /c "C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP && cd ${{ github.workspace }} && build /g /w"
