@@ -1,0 +1,33 @@
+name: Build with WDK 7.1.0
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download WDK 7.1.0
+      run: (New-Object Net.WebClient).DownloadFile("https://download.microsoft.com/download/4/A/2/4A25C7D5-EFBE-4182-B6A9-AE6850409A78/GRMWDK_EN_7600_1.ISO", "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO")
+    - name: Install 7zip
+      run: choco install 7zip
+    - name: Unpack ISO
+      run: 7z.exe x -y -o"${{ github.workspace }}" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
+    - name: Setup WDK 7.1.0
+      run: .\KitSetup.exe /install ALL /ui-level EXPRESS
+      shell: cmd       
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        path: 'srcdir'
+    - name: Build project
+      run: |
+        C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP && D: && cd ${{ github.workspace }}\srcdir && build /g /w
+      shell: cmd
+    - name: Upload artefact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Executable
+        path: ${{ github.workspace }}\srcdir\objfre_wxp_x86\i386\native.exe
+        retention-days: 1
+        
