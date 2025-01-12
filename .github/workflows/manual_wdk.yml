@@ -27,7 +27,7 @@ jobs:
         build /g /w
       shell: cmd
     - name: Upload artefact
-    - uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4
       with:
         name: Executable
         path: ${{ github.workspace }}\srcdir\objfre_wxp_x86\i386\native.exe
