@@ -13,17 +13,11 @@ jobs:
       run: choco install 7zip
     - name: Unpack ISO
       run: |
-        7z.exe x -y -o"${{ github.workspace }}\wdk" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
-        ls ${{ github.workspace }}\wdk
-    - name: Set path for windows (working)
-      shell: bash
-      run: echo "${{ github.workspace }}\wdk" >> $GITHUB_PATH
-    - name: Try exec WDK 7.1.0
-      run: |
-        KitSetup.exe /?
+        7z.exe x -y -o"${{ github.workspace }}" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
+        ls ${{ github.workspace }}
     - name: Setup WDK 7.1.0
-      run: |
-        KitSetup.exe /no-view /log-to-console /install ALL /ui-level EXPRESS
+      run: .\KitSetup.exe /no-view /log-to-console /install ALL /ui-level EXPRESS
+      shell: cmd       
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Build project
