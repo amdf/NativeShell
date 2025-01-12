@@ -51,7 +51,7 @@ jobs:
         run: ls -R
       - name: Prepare release artifact
         run: |
-          zip --junk-paths nativeshell.zip ./*
+          zip -r --junk-paths nativeshell.zip ./*
       - name: Create release
         uses: actions/create-release@v1
         id: create_release
