@@ -15,10 +15,15 @@ jobs:
       run: |
         7z.exe x -y -o"${{ github.workspace }}\wdk" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
         ls ${{ github.workspace }}\wdk
+    - name: Set path for windows (working)
+      shell: bash
+      run: echo "${{ github.workspace }}\wdk" >> $GITHUB_PATH
+    - name: Try exec WDK 7.1.0
+      run: |
+        KitSetup.exe /?
     - name: Setup WDK 7.1.0
       run: |
-        cd ${{ github.workspace }}\wdk
-        .\KitSetup.exe /no-view /log-to-console /install ALL /ui-level EXPRESS
+        KitSetup.exe /no-view /log-to-console /install ALL /ui-level EXPRESS
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Build project
