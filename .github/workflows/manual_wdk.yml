@@ -22,10 +22,7 @@ jobs:
         path: 'srcdir'
     - name: Build project
       run: |
-        C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP
-        D:
-        cd ${{ github.workspace }}\srcdir
-        build /g /w
+        C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP && D: && cd ${{ github.workspace }}\srcdir && build /g /w
       shell: cmd
     - name: Upload artefact
       uses: actions/upload-artifact@v4
