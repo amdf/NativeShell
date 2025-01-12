@@ -12,15 +12,24 @@ jobs:
     - name: Install 7zip
       run: choco install 7zip
     - name: Unpack ISO
-      run: |
-        7z.exe x -y -o"${{ github.workspace }}" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
-        ls ${{ github.workspace }}
+      run: 7z.exe x -y -o"${{ github.workspace }}" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
     - name: Setup WDK 7.1.0
       run: .\KitSetup.exe /no-view /log-to-console /install ALL /ui-level EXPRESS
       shell: cmd       
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        path: 'srcdir'
     - name: Build project
       run: |
-        ls C:\WinDDK
-        cmd /c "C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP && cd ${{ github.workspace }} && build /g /w"
+        C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP
+        cd ${{ github.workspace }}\srcdir
+        build /g /w
+      shell: cmd
+    - name: Upload artefact
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Executable
+        path: ${{ github.workspace }}\srcdir\objfre_wxp_x86\i386\native.exe
+        retention-days: 1
+        
