@@ -10,22 +10,25 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Cache ISO
-      id: cache-wdk
+    - name: Cache WDK
+      id: cache-wdk-installed
       uses: actions/cache@v3
       env:
-        cache-name: cache-wdk-7.1.0
+        cache-name: cache-wdk-7.1.0-installed
       with:
-        path: ${{ github.workspace }}\GRMWDK_EN_7600_1.ISO
+        path: C:\WinDDK\7600.16385.1
         key: ${{ env.cache-name }}
-    - if: ${{ steps.cache-wdk.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.cache-wdk-installed.outputs.cache-hit != 'true' }}
       name: Download WDK 7.1.0.7600
       run: (New-Object Net.WebClient).DownloadFile("https://download.microsoft.com/download/4/A/2/4A25C7D5-EFBE-4182-B6A9-AE6850409A78/GRMWDK_EN_7600_1.ISO", "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO")
-    - name: Install 7zip
+    - if: ${{ steps.cache-wdk-installed.outputs.cache-hit != 'true' }}
+      name: Install 7zip
       run: choco install 7zip
-    - name: Unpack ISO
+    - if: ${{ steps.cache-wdk-installed.outputs.cache-hit != 'true' }}
+      name: Unpack ISO
       run: 7z.exe x -y -o"${{ github.workspace }}" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
-    - name: Setup WDK 7.1.0.7600
+    - if: ${{ steps.cache-wdk-installed.outputs.cache-hit != 'true' }}
+      name: Setup WDK 7.1.0.7600
       run: .\KitSetup.exe /install ALL /ui-level EXPRESS
       shell: cmd       
     - name: Checkout code
