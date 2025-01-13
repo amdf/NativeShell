@@ -34,7 +34,7 @@ HANDLE hKeyboard;
 HANDLE hHeap;
 HANDLE hKey;
 
-#define __NCLI_VER__ "0.12 x86"
+#define __NCLI_VER__ "0.13.0 x86"
 
 WCHAR *helpstr[] =
 {

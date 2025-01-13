@@ -361,7 +361,7 @@ RtlCliListDirectory(VOID)
             if (++i > 20)
             {
               i = 0;
-              RtlCliDisplayString("Continue listing (Y/N):");         
+              RtlCliDisplayString("Continue listing (y/n):");         
               while (TRUE)
               {
                 c = RtlCliGetChar(hKeyboard);

@@ -279,16 +279,18 @@ RtlCliGetLine(IN HANDLE hDriver)
             //
             if (CurrentPosition)
             {
-                // This was a backspace. NtDisplayString does not handle this, so
-                // we unfortunately have to rely on a hack. First we erase the
-                // entire line.
+                // NtDisplayString does not properly handle backspace, so
+                // we unfortunately have to rely on a hack.
                 //
+                // We have to call in the display subsystem to redisplay the
+                // current text buffer and replace last character with space.
+                
                 RtlCliPutChar('\r');
+                RtlClipBackspace();
+                
+                RtlCliPutChar(' ');
 
-                //
-                // Now we have to call in the display subsystem to redisplay the
-                // current text buffer. (NOT the current line input buffer!)
-                //
+                RtlCliPutChar('\r');
                 RtlClipBackspace();
 
                 //
