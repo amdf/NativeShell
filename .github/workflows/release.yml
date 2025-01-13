@@ -7,36 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: windows-latest
-
-    steps:
-    - name: Download WDK 7.1.0.7600
-      run: (New-Object Net.WebClient).DownloadFile("https://download.microsoft.com/download/4/A/2/4A25C7D5-EFBE-4182-B6A9-AE6850409A78/GRMWDK_EN_7600_1.ISO", "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO")
-    - name: Install 7zip
-      run: choco install 7zip
-    - name: Unpack ISO
-      run: 7z.exe x -y -o"${{ github.workspace }}" "${{ github.workspace }}\GRMWDK_EN_7600_1.ISO"
-    - name: Setup WDK 7.1.0.7600
-      run: .\KitSetup.exe /install ALL /ui-level EXPRESS
-      shell: cmd       
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        path: 'srcdir'
-    - name: Build project
-      run: |
-        C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre WXP && D: && cd ${{ github.workspace }}\srcdir && build /g /w
-      shell: cmd
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nativeshell
-        path: |
-          ${{ github.workspace }}\srcdir\objfre_wxp_x86\i386\native.exe
-          ${{ github.workspace }}\srcdir\install\*
-          ${{ github.workspace }}\srcdir\README.md
-        retention-days: 1
+    uses: ./.github/workflows/build.yml
         
   release:
     needs: build
@@ -70,7 +41,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/nativeshell.zip
-          asset_name: nativeshell.winxp-i386.zip
+          asset_name: nativeshell.i386.zip
           asset_content_type: application/zip
 
     
