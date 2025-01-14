@@ -34,7 +34,7 @@ HANDLE hKeyboard;
 HANDLE hHeap;
 HANDLE hKey;
 
-#define __NCLI_VER__ "0.13.0 x86"
+#define __NCLI_VER__ "0.13.1 x86"
 
 WCHAR *helpstr[] =
 {
@@ -430,7 +430,7 @@ main(INT argc,
     // Show banner
     //
     RtlCliDisplayString("Native Shell [Version " __NCLI_VER__ "] (" __DATE__ " " __TIME__ ")\n");
-    RtlCliDisplayString("(C) Copyright 2010-2011 amdf\n");
+    RtlCliDisplayString("(C) Copyright 2010-2025 amdf\n");
     RtlCliDisplayString("(C) Copyright 2006 TinyKRNL Project\n\n");
     RtlCliDisplayString("Type \"help\".\n\n");
 
