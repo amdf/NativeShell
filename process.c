@@ -46,6 +46,12 @@ NTSTATUS CreateNativeProcess(IN PCWSTR file_name, IN PCWSTR cmd_line, OUT PHANDL
  status = RtlCreateUserProcess(&imgpath, OBJ_CASE_INSENSITIVE, processparameters,
                                 NULL, NULL, NULL, FALSE, NULL, NULL, &processinformation);
 
+ if (processinformation.ImageInformation.SubSystemType != IMAGE_SUBSYSTEM_NATIVE)
+ {
+   RtlCliDisplayString("\nThe %S application cannot be run in native mode.\n", file_name);
+   return STATUS_UNSUCCESSFUL;
+ }
+
  if (!NT_SUCCESS(status))
  {
    RtlCliDisplayString("RtlCreateUserProcess failed\n");
