@@ -35,10 +35,10 @@ HANDLE hHeap;
 HANDLE hKey;
 
 #define __APP_VER__ "0.13.2"
-#if defined(_WIN64)
-#define __NCLI_VER__ __APP_VER__ " x86"
+#if defined(_M_AMD64) || defined(_AMD64_)
+#define __NCLI_VER__ __APP_VER__ "-alpha (x64)"
 #else
-#define __NCLI_VER__ __APP_VER__ " x64"
+#define __NCLI_VER__ __APP_VER__ " (x86)"
 #endif
 
 WCHAR *helpstr[] =
