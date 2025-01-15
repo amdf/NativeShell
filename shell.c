@@ -1,6 +1,5 @@
 #include "precomp.h"
 
-// массив, который используется функцией StringToArguments
 char *xargv[BUFFER_SIZE];
 unsigned int xargc;
 

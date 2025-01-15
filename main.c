@@ -34,7 +34,12 @@ HANDLE hKeyboard;
 HANDLE hHeap;
 HANDLE hKey;
 
-#define __NCLI_VER__ "0.13.1 x86"
+#define __APP_VER__ "0.13.2"
+#if defined(_WIN64)
+#define __NCLI_VER__ __APP_VER__ " x86"
+#else
+#define __NCLI_VER__ __APP_VER__ " x64"
+#endif
 
 WCHAR *helpstr[] =
 {
