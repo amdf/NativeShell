@@ -56,7 +56,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: nativeshell-x64-alpha
-        path: |
-          $${{ github.workspace }}\srcdir\objfre_win7_amd64\amd64\native.exe
+        path: ${{ github.workspace }}\srcdir\objfre_win7_amd64\amd64\native.exe
         retention-days: 1
                  
