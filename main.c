@@ -36,9 +36,9 @@ HANDLE hKey;
 
 #define __APP_VER__ "0.13.2"
 #if defined(_M_AMD64) || defined(_AMD64_)
-#define __NCLI_VER__ __APP_VER__ "-alpha (x64)"
+#define __NCLI_VER__ __APP_VER__ "-alpha x64"
 #else
-#define __NCLI_VER__ __APP_VER__ " (x86)"
+#define __NCLI_VER__ __APP_VER__ " x86"
 #endif
 
 WCHAR *helpstr[] =
@@ -168,8 +168,6 @@ RtlClipProcessMessage(PCHAR Command)
         //
         RtlInitUnicodeString(&CurrentDirectoryString, CurrentDirectory);
         RtlCliPrintString(&CurrentDirectoryString);
-
-        RtlFreeUnicodeString(&CurrentDirectoryString);
     }
     else if (!_strnicmp(Command, "dir", 3))
     {
@@ -343,21 +341,19 @@ RtlClipProcessMessage(PCHAR Command)
           RtlAnsiStringToUnicodeString(&us, &as, TRUE);
                              
           NtClose(hKeyboard);
-          //RtlCliDisplayString("Keyboard is closed\n");
 
           CreateNativeProcess(filename, us.Buffer, &hProcess);
 
-          RtlFreeAnsiString(&as);
           RtlFreeUnicodeString(&us);
 
-          //RtlCliDisplayString("Waiting for process terminations\n");
           NtWaitForSingleObject(hProcess, FALSE, NULL);
                     
           RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
-          //RtlCliDisplayString("Keyboard restored\n");
         } else
         {
-          RtlCliDisplayString("%s not recognized\n", Command);
+          RtlCliDisplayString("%s not recognized\n"
+              "Add .exe if you want to lauch executable file."
+              "\nType \"help\" for the list of commands.\n", Command);
         }        
     }
 }
@@ -434,10 +430,7 @@ main(INT argc,
     //
     // Show banner
     //
-    RtlCliDisplayString("Native Shell [Version " __NCLI_VER__ "] (" __DATE__ " " __TIME__ ")\n");
-    RtlCliDisplayString("(C) Copyright 2010-2025 amdf\n");
-    RtlCliDisplayString("(C) Copyright 2006 TinyKRNL Project\n\n");
-    RtlCliDisplayString("Type \"help\".\n\n");
+    RtlCliDisplayString("Native Shell v" __NCLI_VER__ " (" __DATE__ " " __TIME__ ")\n\n");
 
     //
     // Setup keyboard input

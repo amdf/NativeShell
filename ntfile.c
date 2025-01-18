@@ -314,11 +314,9 @@ BOOLEAN NtFileDeleteFile(PCWSTR filename)
 
   if (!NT_SUCCESS(status))
   {    
-    RtlFreeUnicodeString(&us);
     return FALSE;
   }
 
-  RtlFreeUnicodeString(&us);
   return TRUE;
 }
 
@@ -353,18 +351,15 @@ BOOLEAN NtFileCreateDirectory(PCWSTR dirname)
   if (NT_SUCCESS(status))
   {
     NtClose(hFile);
-    RtlFreeUnicodeString(&us);
     return TRUE;
   }
 
   /* if it already exists then return success */
   if (status == STATUS_OBJECT_NAME_COLLISION) 
   {
-    RtlFreeUnicodeString(&us);
     return TRUE;
   }
 
-  RtlFreeUnicodeString(&us);
   return FALSE;
 }
 

@@ -247,10 +247,15 @@ RtlCliListHardwareTree(VOID)
     // Get the root node's child
     //
     Status = RtlCliGetChildOrSibling(ROOT_NAME, Buffer, PNP_GET_CHILD_DEVICE);
-
+    if (!NT_SUCCESS(Status)) {
+        RtlCliDisplayString("NtPlugPlayControl get root node failed.\n");
+    }
     //
     // Now get the entire tree
     //
     Status = RtlCliListSubNodes(ROOT_NAME, NULL, Buffer);
+    if (!NT_SUCCESS(Status)) {
+        RtlCliDisplayString("NtPlugPlayControl get child nodes failed.\n");
+    }
     return Status;
 }

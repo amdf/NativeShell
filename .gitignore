@@ -4,3 +4,4 @@ objfre_wxp_x86
 objfre_win7_amd64
 *.err
 *.wrn
+*.cmd

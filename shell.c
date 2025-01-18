@@ -39,7 +39,6 @@ BOOL GetFullPath(IN PCSTR filename, OUT PWSTR out, IN BOOL add_slash)
     }
 
     RtlFreeUnicodeString(&us);
-    RtlFreeAnsiString(&as);
   } else
   {
     RtlInitAnsiString(&as, filename);
@@ -57,7 +56,6 @@ BOOL GetFullPath(IN PCSTR filename, OUT PWSTR out, IN BOOL add_slash)
     }
 
     RtlFreeUnicodeString(&us);
-    RtlFreeAnsiString(&as);
   }
   return TRUE;
 }
@@ -183,7 +181,6 @@ BOOL FolderExists(PCWSTR foldername)
    
   RtlInitUnicodeString(&u_filename, foldername);
   RtlDosPathNameToNtPathName_U(u_filename.Buffer, &nt_filename, NULL, NULL);
-  RtlFreeUnicodeString(&u_filename);
 
   InitializeObjectAttributes(&oa, &nt_filename, OBJ_CASE_INSENSITIVE, 0, 0);
   st = NtQueryAttributesFile(&oa, &fbi);  
@@ -211,7 +208,6 @@ BOOL FileExists(PCWSTR filename)
 
   RtlInitUnicodeString(&u_filename, filename);
   RtlDosPathNameToNtPathName_U(u_filename.Buffer, &nt_filename, NULL, NULL);
-  RtlFreeUnicodeString(&u_filename);
 
   InitializeObjectAttributes(&oa, &nt_filename, OBJ_CASE_INSENSITIVE, 0, 0);
   st = NtQueryAttributesFile(&oa, &fbi);
@@ -327,18 +323,18 @@ UINT GetStringLength(WCHAR* pszInput)
 }
 
 // Note: This function allocates memory for "us" variable.
-void FillUnicodeStringWithAnsi(OUT PUNICODE_STRING us, IN PCHAR as)
-{  
-  ANSI_STRING ansi_string;
+// void FillUnicodeStringWithAnsi(OUT PUNICODE_STRING us, IN PCHAR as)
+// {  
+//   ANSI_STRING ansi_string;
 
-  RtlInitAnsiString(&ansi_string, as);
+//   RtlInitAnsiString(&ansi_string, as);
 
-  if (!NT_SUCCESS(RtlAnsiStringToUnicodeString(us, &ansi_string, TRUE)))
-  {
-    RtlCliDisplayString("RtlAnsiStringToUnicodeString() failed\n");
-    return;
-  }
+//   if (!NT_SUCCESS(RtlAnsiStringToUnicodeString(us, &ansi_string, TRUE)))
+//   {
+//     RtlCliDisplayString("RtlAnsiStringToUnicodeString() failed\n");
+//     return;
+//   }
 
-  RtlFreeAnsiString(&ansi_string);
-  return;
-}
+//   RtlFreeAnsiString(&ansi_string);
+//   return;
+// }

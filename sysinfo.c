@@ -337,15 +337,6 @@ RtlCliDumpSysInfo(VOID)
     if (!NT_SUCCESS(Status)) return Status;
 
     //
-    // Query basic system information
-    //
-    Status = NtQuerySystemInformation(SystemFileCacheInformation,
-                                      &CacheInfo,
-                                      sizeof(CacheInfo),
-                                      NULL);
-    if (!NT_SUCCESS(Status)) return Status;
-
-    //
     // Display Header
     // FIXME: Center it
     //
@@ -488,13 +479,19 @@ RtlCliDumpSysInfo(VOID)
     //
     // Display FileSystem Cache Information
     //
-    RtlCliDisplayString("[CACHE] Size: %dKB. Peak: %dKB. "
-                        "Min WS: %dKB. Max WS: %dKB\n",
-                        CacheInfo.CurrentSize / 1024,
-                        CacheInfo.PeakSize / 1024,
-                        CacheInfo.MinimumWorkingSet,
-                        CacheInfo.MaximumWorkingSet);
-
+    Status = NtQuerySystemInformation(SystemFileCacheInformation,
+                                      &CacheInfo,
+                                      sizeof(CacheInfo),
+                                      NULL);
+    if (NT_SUCCESS(Status)) {
+        RtlCliDisplayString("[CACHE] Size: %dKB. Peak: %dKB. "
+                            "Min WS: %dKB. Max WS: %dKB\n",
+                            CacheInfo.CurrentSize / 1024,
+                            CacheInfo.PeakSize / 1024,
+                            CacheInfo.MinimumWorkingSet,
+                            CacheInfo.MaximumWorkingSet);
+    }
+    
     //
     // Return success
     //
