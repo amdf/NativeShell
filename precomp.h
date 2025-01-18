@@ -192,7 +192,7 @@ NTSTATUS RegReadValue(HANDLE hKey, PWCHAR key_name, OUT PULONG type, OUT PVOID d
 
 // Misc
 
-void FillUnicodeStringWithAnsi(OUT PUNICODE_STRING us, IN PCHAR as);
+// void FillUnicodeStringWithAnsi(OUT PUNICODE_STRING us, IN PCHAR as);
 
 //===========================================================
 //

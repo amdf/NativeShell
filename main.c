@@ -168,8 +168,6 @@ RtlClipProcessMessage(PCHAR Command)
         //
         RtlInitUnicodeString(&CurrentDirectoryString, CurrentDirectory);
         RtlCliPrintString(&CurrentDirectoryString);
-
-        RtlFreeUnicodeString(&CurrentDirectoryString);
     }
     else if (!_strnicmp(Command, "dir", 3))
     {
@@ -347,7 +345,7 @@ RtlClipProcessMessage(PCHAR Command)
 
           CreateNativeProcess(filename, us.Buffer, &hProcess);
 
-          RtlFreeAnsiString(&as);
+          // RtlFreeAnsiString(&as);
           RtlFreeUnicodeString(&us);
 
           //RtlCliDisplayString("Waiting for process terminations\n");

@@ -90,7 +90,6 @@ RtlCliSetCurrentDirectory(PCHAR Directory)
   GetFullPath(Directory, buf, TRUE);
   RtlInitUnicodeString(&us, buf);
   RtlSetCurrentDirectory_U(&us);
-  RtlFreeUnicodeString(&us);
 
   return STATUS_SUCCESS;
 }
