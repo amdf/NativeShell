@@ -36,9 +36,9 @@ HANDLE hKey;
 
 #define __APP_VER__ "0.13.2"
 #if defined(_M_AMD64) || defined(_AMD64_)
-#define __NCLI_VER__ __APP_VER__ "-alpha (x64)"
+#define __NCLI_VER__ __APP_VER__ "-alpha x64"
 #else
-#define __NCLI_VER__ __APP_VER__ " (x86)"
+#define __NCLI_VER__ __APP_VER__ " x86"
 #endif
 
 WCHAR *helpstr[] =
@@ -434,10 +434,7 @@ main(INT argc,
     //
     // Show banner
     //
-    RtlCliDisplayString("Native Shell [Version " __NCLI_VER__ "] (" __DATE__ " " __TIME__ ")\n");
-    RtlCliDisplayString("(C) Copyright 2010-2025 amdf\n");
-    RtlCliDisplayString("(C) Copyright 2006 TinyKRNL Project\n\n");
-    RtlCliDisplayString("Type \"help\".\n\n");
+    RtlCliDisplayString("Native Shell v" __NCLI_VER__ " (" __DATE__ " " __TIME__ ")\n\n");
 
     //
     // Setup keyboard input
