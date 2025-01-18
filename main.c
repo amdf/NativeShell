@@ -341,21 +341,19 @@ RtlClipProcessMessage(PCHAR Command)
           RtlAnsiStringToUnicodeString(&us, &as, TRUE);
                              
           NtClose(hKeyboard);
-          //RtlCliDisplayString("Keyboard is closed\n");
 
           CreateNativeProcess(filename, us.Buffer, &hProcess);
 
-          // RtlFreeAnsiString(&as);
           RtlFreeUnicodeString(&us);
 
-          //RtlCliDisplayString("Waiting for process terminations\n");
           NtWaitForSingleObject(hProcess, FALSE, NULL);
                     
           RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
-          //RtlCliDisplayString("Keyboard restored\n");
         } else
         {
-          RtlCliDisplayString("%s not recognized\n", Command);
+          RtlCliDisplayString("%s not recognized\n"
+              "Add .exe if you want to lauch executable file."
+              "\nType \"help\" for the list of commands.\n", Command);
         }        
     }
 }

@@ -181,7 +181,6 @@ BOOL FolderExists(PCWSTR foldername)
    
   RtlInitUnicodeString(&u_filename, foldername);
   RtlDosPathNameToNtPathName_U(u_filename.Buffer, &nt_filename, NULL, NULL);
-  // RtlFreeUnicodeString(&u_filename);
 
   InitializeObjectAttributes(&oa, &nt_filename, OBJ_CASE_INSENSITIVE, 0, 0);
   st = NtQueryAttributesFile(&oa, &fbi);  
@@ -209,7 +208,6 @@ BOOL FileExists(PCWSTR filename)
 
   RtlInitUnicodeString(&u_filename, filename);
   RtlDosPathNameToNtPathName_U(u_filename.Buffer, &nt_filename, NULL, NULL);
-  // RtlFreeUnicodeString(&u_filename);
 
   InitializeObjectAttributes(&oa, &nt_filename, OBJ_CASE_INSENSITIVE, 0, 0);
   st = NtQueryAttributesFile(&oa, &fbi);
