@@ -43,19 +43,22 @@ jobs:
       run: |
         C:\WinDDK\7600.16385.1\bin\setenv.bat C:\WinDDK\7600.16385.1 fre x64 WIN7 && D: && cd ${{ github.workspace }}\srcdir && build /g /w
       shell: cmd
-    - name: Upload artifact x86
+    - name: Upload artifact i386
       uses: actions/upload-artifact@v4
       with:
-        name: nativeshell
+        name: nativeshell-i386
         path: |
           ${{ github.workspace }}\srcdir\objfre_wxp_x86\i386\native.exe
           ${{ github.workspace }}\srcdir\install\*
           ${{ github.workspace }}\srcdir\README.md
         retention-days: 1
-    - name: Upload artifact x64
+    - name: Upload artifact amd64
       uses: actions/upload-artifact@v4
       with:
-        name: nativeshell-x64-alpha
-        path: ${{ github.workspace }}\srcdir\objfre_win7_amd64\amd64\native.exe
+        name: nativeshell-amd64
+        path: |
+          ${{ github.workspace }}\srcdir\objfre_win7_amd64\amd64\native.exe
+          ${{ github.workspace }}\srcdir\install\*
+          ${{ github.workspace }}\srcdir\README.md
         retention-days: 1
                  
