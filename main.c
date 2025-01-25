@@ -314,49 +314,55 @@ RtlClipProcessMessage(PCHAR Command)
       }
     }
     else
+    if ((strlen(argv[0]) == 2) && (argv[0][1] == ':'))
     {
-        // Unknown command, try to find an executable and run it.
-        WCHAR filename[MAX_PATH] = {0};
-        BOOL bExist = FALSE;
+      // Change disk
+      RtlCliSetCurrentDirectory(argv[0]);
+      return;
+    } else
+    {      
+      // Unknown command, try to find an executable and run it.
+      WCHAR filename[MAX_PATH] = {0};
+      BOOL bExist = FALSE;
 
-        GetFullPath(argv[0], filename, FALSE);
+      GetFullPath(argv[0], filename, FALSE);
 
+      bExist = FileExists(filename);
+      if (!bExist)
+      {
+        UINT uOrigLen = wcslen(filename);
+        // RtlCliDisplayString("Not exist '%S'\n", filename);
+        wcscat(filename, L".exe");
         bExist = FileExists(filename);
-        if (!bExist)
+        // if (!bExist)
+        //   RtlCliDisplayString("Not exist '%S'\n", filename);
+      }
+
+      if (bExist)
+      {
+        HANDLE hProcess;
+        NTSTATUS status;
+        ANSI_STRING as;
+        UNICODE_STRING us;
+        RtlInitAnsiString(&as, Command);
+        RtlAnsiStringToUnicodeString(&us, &as, TRUE);
+        
+        NtClose(hKeyboard);
+
+        status = CreateNativeProcess(filename, us.Buffer, &hProcess);
+        if (NT_SUCCESS(status))
         {
-          UINT uOrigLen = wcslen(filename);
-          // RtlCliDisplayString("Not exist '%S'\n", filename);
-          wcscat(filename, L".exe");
-          bExist = FileExists(filename);
-          // if (!bExist)
-          //   RtlCliDisplayString("Not exist '%S'\n", filename);
+          NtWaitForSingleObject(hProcess, FALSE, NULL);
+        } else {
+          RtlCliDisplayString("Failed to execute %s\n", Command);
         }
-
-        if (bExist)
-        {
-          HANDLE hProcess;
-          NTSTATUS status;
-          ANSI_STRING as;
-          UNICODE_STRING us;
-          RtlInitAnsiString(&as, Command);
-          RtlAnsiStringToUnicodeString(&us, &as, TRUE);
-          
-          NtClose(hKeyboard);
-
-          status = CreateNativeProcess(filename, us.Buffer, &hProcess);
-          if (NT_SUCCESS(status))
-          {
-            NtWaitForSingleObject(hProcess, FALSE, NULL);
-          } else {
-            RtlCliDisplayString("Failed to execute %s\n", Command);
-          }
-          RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
-          RtlFreeUnicodeString(&us);
-        } else
-        {
-          RtlCliDisplayString("%s is not recognized as a command or an executable file name\n"
-              "\nType \"help\" for the list of commands.\n", Command);
-        }        
+        RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
+        RtlFreeUnicodeString(&us);
+      } else
+      {
+        RtlCliDisplayString("%s is not recognized as a command or an executable file name\n"
+            "\nType \"help\" for the list of commands.\n", Command);
+      }        
     }
 }
 
@@ -384,13 +390,18 @@ RtlClipDisplayPrompt(VOID)
     //
     DirSize = RtlCliGetCurrentDirectory(CurrentDirectory) / sizeof(WCHAR);
 
-    //
-    // Display it
-    //
-    CurrentDirectory[DirSize] = L'>';
-    CurrentDirectory[DirSize + 1] = UNICODE_NULL;
-    RtlInitUnicodeString(&DirString, CurrentDirectory);
-    RtlCliPrintString(&DirString);
+    if (!RtlDosPathNameToNtPathName_U(CurrentDirectory,
+                                      &DirString,
+                                      NULL,
+                                      NULL))
+    {
+        CurrentDirectory[DirSize] = L'>';
+        CurrentDirectory[DirSize + 1] = UNICODE_NULL;
+        RtlInitUnicodeString(&DirString, CurrentDirectory);
+        RtlCliPrintString(&DirString);
+    }
+
+    RtlCliDisplayString("%S>>", CurrentDirectory);
 }
 
 /*++
