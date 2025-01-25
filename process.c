@@ -54,15 +54,7 @@ NTSTATUS CreateNativeProcess(IN PCWSTR file_name, IN PCWSTR cmd_line, OUT PHANDL
  
  if (processinformation.ImageInformation.SubSystemType != IMAGE_SUBSYSTEM_NATIVE)
  {
-   RtlCliDisplayString("\nThe %S application cannot be run in native mode.\n"
-   "Subsystem: %d\n"
-   "Subsystem version: %d\n"
-   "Machine: %d\n",
-        file_name, 
-        processinformation.ImageInformation.SubSystemType,
-        processinformation.ImageInformation.SubSystemVersion,
-        processinformation.ImageInformation.Machine
-    );
+   RtlCliDisplayString("\nThe %S application cannot be run in native mode.\n", file_name);
    return STATUS_UNSUCCESSFUL;
  }
 

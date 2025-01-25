@@ -316,33 +316,45 @@ RtlClipProcessMessage(PCHAR Command)
     else
     {
         // Unknown command, try to find an executable and run it.
-        // Executable name should be with an .exe extension.
-        
-        WCHAR filename[MAX_PATH];
-        ANSI_STRING as;
-        UNICODE_STRING us;
-        HANDLE hProcess;
+        WCHAR filename[MAX_PATH] = {0};
+        BOOL bExist = FALSE;
 
-        GetFullPath(IN argv[1], OUT filename, FALSE);
-    
-        if (FileExists(filename))
+        GetFullPath(argv[0], filename, FALSE);
+
+        bExist = FileExists(filename);
+        if (!bExist)
         {
+          UINT uOrigLen = wcslen(filename);
+          // RtlCliDisplayString("Not exist '%S'\n", filename);
+          wcscat(filename, L".exe");
+          bExist = FileExists(filename);
+          // if (!bExist)
+          //   RtlCliDisplayString("Not exist '%S'\n", filename);
+        }
+
+        if (bExist)
+        {
+          HANDLE hProcess;
+          NTSTATUS status;
+          ANSI_STRING as;
+          UNICODE_STRING us;
           RtlInitAnsiString(&as, Command);
           RtlAnsiStringToUnicodeString(&us, &as, TRUE);
-                             
+          
           NtClose(hKeyboard);
 
-          CreateNativeProcess(filename, us.Buffer, &hProcess);
-
-          RtlFreeUnicodeString(&us);
-
-          NtWaitForSingleObject(hProcess, FALSE, NULL);
-                    
+          status = CreateNativeProcess(filename, us.Buffer, &hProcess);
+          if (NT_SUCCESS(status))
+          {
+            NtWaitForSingleObject(hProcess, FALSE, NULL);
+          } else {
+            RtlCliDisplayString("Failed to execute %s\n", Command);
+          }
           RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
+          RtlFreeUnicodeString(&us);
         } else
         {
-          RtlCliDisplayString("%s not recognized\n"
-              "Add .exe if you want to lauch executable file."
+          RtlCliDisplayString("%s is not recognized as a command or an executable file name\n"
               "\nType \"help\" for the list of commands.\n", Command);
         }        
     }
