@@ -99,7 +99,7 @@ RtlClipProcessMessage(PCHAR Command)
         DeinitHeapMemory( hHeap );
         NtTerminateProcess(NtCurrentProcess(), 0);
     }
-    else if (!_strnicmp(argv[0], CMDSTR("test")))
+    else if (!_strnicmp(argv[0], CMDSTR("argtest")))
     {
       UINT i = 0;
       
