@@ -27,13 +27,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Download i386 binary 
         uses: actions/download-artifact@v4
-        working-directory: ${{ github.workspace }}/i386
         with:
           name: nativeshell-i386
+          path: ${{ github.workspace }}/i386
       - name: Prepare release i386 binary
         working-directory: ${{ github.workspace }}/i386
-        run: |
-          zip -r --junk-paths nativeshell.zip ./*
+        run: zip -r --junk-paths nativeshell.zip ./*
       - name: Release i386 binary 
         uses: actions/upload-release-asset@v1
         env:
@@ -45,13 +44,12 @@ jobs:
           asset_content_type: application/zip
       - name: Download amd64 binary 
         uses: actions/download-artifact@v4
-        working-directory: ${{ github.workspace }}/amd64
         with:
           name: nativeshell-amd64
+          path: ${{ github.workspace }}/amd64
       - name: Prepare release amd64 binary
         working-directory: ${{ github.workspace }}/amd64
-        run: |
-          zip -r --junk-paths nativeshell.zip ./*
+        run: zip -r --junk-paths nativeshell.zip ./*
       - name: Release amd64 binary 
         uses: actions/upload-release-asset@v1
         env:

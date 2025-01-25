@@ -145,11 +145,16 @@ RtlClipProcessMessage(PCHAR Command)
     }
     else if (!_strnicmp(argv[0], CMDSTR("drawtext")))
     {
-        //
-        // Set the current directory
-        //
-      
-        NtSetDefaultLocale(TRUE, 1049);
+#if (NTDDI_VERSION >= NTDDI_WIN7)
+        UNICODE_STRING us;
+        ANSI_STRING as;
+        RtlInitAnsiString(&as, &Command[9]);
+        RtlAnsiStringToUnicodeString(&us, &as, TRUE);
+        NtDrawText(&us);
+        RtlFreeUnicodeString(&us);
+#else
+        RtlCliDisplayString("\nNot supported prior to Win7\n");
+#endif
     }
     else if (!_strnicmp(argv[0], CMDSTR("pwd")))
     {

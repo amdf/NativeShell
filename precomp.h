@@ -32,6 +32,7 @@ Revision History:
 #include <winnt.h>
 #include <ntndk.h>
 #include <ntddkbd.h>
+#include <sdkddkver.h>
 #include "ntfile.h"
 #include "ntreg.h"
 

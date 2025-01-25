@@ -223,6 +223,13 @@ NtDisplayString(
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
+NtDrawText(
+    IN PUNICODE_STRING DisplayString
+);
+
+NTSYSCALLAPI
+NTSTATUS
+NTAPI
 NtEnumerateSystemEnvironmentValuesEx(
     IN ULONG InformationClass,
     IN PVOID Buffer,
