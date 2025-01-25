@@ -1,8 +1,5 @@
 #include "precomp.h"
 
-char *xargv[BUFFER_SIZE];
-unsigned int xargc;
-
 /*
  *****************************************************************************
  * GetFullPath - Get a full path.
@@ -61,90 +58,60 @@ BOOL GetFullPath(IN PCSTR filename, OUT PWSTR out, IN BOOL add_slash)
 }
 
 // Argument processing functions:
+static CHAR *xargv[NUM_ARGS];
 
-char *xargv[BUFFER_SIZE];
-unsigned int xargc;
-
-char * xstrtok(char * s, const char * ct)
+CHAR **StringToArguments(CHAR *string, UINT *argc)
 {
-  static char * old_strtok;  
-	char *sbegin, *send;
-	sbegin  = s ? s : old_strtok;
-	if (!sbegin)
-  {
-		return NULL;
-	}
-	sbegin += strspn(sbegin,ct);
-	if (*sbegin == '\0')
-  {
-		old_strtok = NULL;
-		return( NULL );
-	}
-	send = strpbrk( sbegin, ct);
-	if (send && *send != '\0') 
-  {
-		*send++ = '\0';
-  }
-	old_strtok = send;
-	return (sbegin);
-}
+	/* Extract whitespace- and quotes- delimited tokens from the given string
+	   and put them into the tokens array. Returns number of tokens
+	   extracted. Length specifies the current size of tokens[].
+	   THIS METHOD MODIFIES string.  */
 
-UINT StringToArguments(CHAR *str)
-{
-  BOOL q = FALSE;   
-  char *p;
+	const char *whitespace = " \t\r\n";
+	char *tokenEnd;
+	const char *quoteCharacters = "\"\'";
+	char *end = string + strlen(string);
+  UINT length = NUM_ARGS;
+
+	if ((NULL == string) || (NULL == argc) || (0 == length)) 
+    return NULL;
   
-  p = str;
+  *argc = 0;
 
-  // 0x01 as a separator
+	while(1) {
+		const char *q;
+		/* Skip over initial whitespace.  */
+		string += strspn(string, whitespace);
+		if(!*string) break;
 
-  do
-  {
-    switch (*p)
-    {
-      case ' ':
-        if (q)
-        {
-          ;
-        } else
-        {
-          *p = '\1';
-        }      
-        break;
-      case '\"':
-        if (q)
-        {
-          q = FALSE;
-        } else
-        {
-          q = TRUE;
-        }
-        *p = '\1';
-        break;
-      default:
-        
-      break;
-    }   
-    *p++;
-  } while (*p);
+		for(q = quoteCharacters; *q; ++q) {
+			if(*string == *q) break;
+		}
+		if(*q) {
+			/* Token is quoted.  */
+			char quote = *string++;
+			tokenEnd = strchr(string, quote);
+			/* If there is no endquote, the token is the rest of the string.  */
+			if(!tokenEnd) tokenEnd = end;
+		} else {
+			tokenEnd = string + strcspn(string, whitespace);
+		}
 
-  xargc = 0; 
+		*tokenEnd = 0;
 
-  p = xstrtok(str, "\1");
-  if (p) 
-  {
-    xargv[++xargc] = p;
-    while (p != NULL) 
-    {
-      p = xstrtok(NULL, "\1");
-      xargv[++xargc] = p;
-    }
+    xargv[*argc] = string;
+
+    *argc = *argc + 1;
+
+    // RtlCliDisplayString("Arg %d: %s\n", argc, xargv[*argc]);
     
-    return xargc;
-  }
-  
-  return 0;
+		if ((tokenEnd == end) || (*argc >= length)) break;
+		string = tokenEnd + 1;
+	}
+
+	return xargv;
 }
+
 
 /******************************************************************************\
  * GetFileAttributesNt - Get File Attributes
