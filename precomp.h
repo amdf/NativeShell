@@ -132,7 +132,7 @@ RtlCliListHardwareTree(
 //
 NTSTATUS
 RtlCliListDirectory(
-    VOID
+    PWCHAR CurrentDirectory
 );
 
 NTSTATUS

@@ -167,8 +167,24 @@ RtlClipProcessMessage(PCHAR Command)
     }
     else if (!_strnicmp(argv[0], CMDSTR("dir")))
     {
-        // List the current directory
-        RtlCliListDirectory();
+      WCHAR Dir[MAX_PATH];
+      WCHAR ArgDir[MAX_PATH];
+      RtlCliGetCurrentDirectory(Dir);
+      if (argc > 1)
+      {
+        UNICODE_STRING us;
+        ANSI_STRING as;
+        RtlInitAnsiString(&as, argv[1]);
+        RtlAnsiStringToUnicodeString(&us, &as, TRUE);
+
+        AppendString(Dir, L"\\");
+        AppendString(Dir, us.Buffer);
+        
+        RtlFreeUnicodeString(&us);
+      }
+      
+      // List directory
+      RtlCliListDirectory(Dir);
     }
     else if (!_strnicmp(argv[0], CMDSTR("devtree")))
     {
@@ -382,26 +398,18 @@ VOID
 RtlClipDisplayPrompt(VOID)
 {
     WCHAR CurrentDirectory[MAX_PATH];
-    ULONG DirSize;
     UNICODE_STRING DirString;
 
-    //
-    // Get the current directory
-    //
-    DirSize = RtlCliGetCurrentDirectory(CurrentDirectory) / sizeof(WCHAR);
+    RtlCliGetCurrentDirectory(CurrentDirectory);
 
-    if (!RtlDosPathNameToNtPathName_U(CurrentDirectory,
-                                      &DirString,
-                                      NULL,
-                                      NULL))
+    if (!RtlDosPathNameToNtPathName_U(CurrentDirectory, &DirString, NULL, NULL))
     {
-        CurrentDirectory[DirSize] = L'>';
-        CurrentDirectory[DirSize + 1] = UNICODE_NULL;
-        RtlInitUnicodeString(&DirString, CurrentDirectory);
-        RtlCliPrintString(&DirString);
+      RtlCliDisplayString("%S>", CurrentDirectory);
+      return;
     }
 
-    RtlCliDisplayString("%S>>", CurrentDirectory);
+    RtlCliPrintString(&DirString);
+    RtlCliPutChar(L'>');
 }
 
 /*++
