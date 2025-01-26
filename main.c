@@ -426,24 +426,24 @@ main(INT argc,
     hHeap = InitHeapMemory();
     hKey = NULL;
 
-    //
+
     // Show banner
-    //
+
     RtlCliDisplayString("Native Shell v" __NCLI_VER__ " (" __DATE__ " " __TIME__ ")\n\n");
 
-    //
+
     // Setup keyboard input
-    //
+
     Status = RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
 
-    //
+
     // Show initial prompt
-    //
+
     RtlClipDisplayPrompt();
 
-    //
+
     // Wait for a new line
-    //
+
     while (TRUE)
     {
 
@@ -474,8 +474,8 @@ main(INT argc,
     DeinitHeapMemory( hHeap );
     NtTerminateProcess( NtCurrentProcess(), 0 );
     
-    //
+
     // Return
-    //
+
     return STATUS_SUCCESS;
 }

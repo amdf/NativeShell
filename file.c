@@ -25,9 +25,9 @@
 ULONG
 RtlCliGetCurrentDirectory(IN OUT PWSTR CurrentDirectory)
 {
-    //
+
     // Get the current directory into our buffer
-    //
+
     return RtlGetCurrentDirectory_U(MAX_PATH * sizeof(WCHAR),
                                     CurrentDirectory);
 }
@@ -103,25 +103,25 @@ RtlCliDumpFileInfo(PFILE_BOTH_DIR_INFORMATION DirInfo)
     UINT file_size = 0;
     UINT short_size = 0;
 
-    //
+
     // The filename isn't null-terminated, and the next structure follows
     // right after it. So, we save the next char (which ends up being the
     // NextEntryOffset of the next structure), then temporarly clear it so
     // that the RtlCliDisplayString can treat it as a null-terminated string
-    //
+
     Null = (PWCHAR)((PBYTE)DirInfo->FileName + DirInfo->FileNameLength);
     Save = *Null;
     *Null = 0;
 
-    //
+
     // Get the last access time
-    //
+
     RtlSystemTimeToLocalTime(&DirInfo->CreationTime, &DirInfo->CreationTime);
     RtlTimeToTimeFields(&DirInfo->CreationTime, &Time);
 
-    //
+
     // Don't display sizes for directories
-    //
+
     if (!(DirInfo->FileAttributes & FILE_ATTRIBUTE_DIRECTORY))
     {
         sprintf(SizeString, "%d", DirInfo->AllocationSize.LowPart);
@@ -131,9 +131,9 @@ RtlCliDumpFileInfo(PFILE_BOTH_DIR_INFORMATION DirInfo)
         sprintf(SizeString, " ", DirInfo->AllocationSize.LowPart);
     }
 
-    //
+
     // Display this entry
-    //
+
 
     // 75 symbols. 
 
@@ -175,9 +175,9 @@ RtlCliDumpFileInfo(PFILE_BOTH_DIR_INFORMATION DirInfo)
                      ShortString);
 
 
-    //
+
     // Restore the character that was here before
-    //
+
     *Null = Save;
 }
 
@@ -207,23 +207,23 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
     HANDLE EventHandle;
     CHAR i, c;
 
-    //
+
     // Convert dir to NT Format
-    //
+
     if (!RtlDosPathNameToNtPathName_U(CurrentDirectory,
                                       &DirectoryString,
                                       NULL,
                                       NULL))
     {
-        //
+
         // Fail
-        //
+
         return STATUS_UNSUCCESSFUL;
     }
 
-    //
+
     // Initialize the object attributes
-    //
+
     RtlCliDisplayString(" Directory of %S\n\n", CurrentDirectory);
     InitializeObjectAttributes(&ObjectAttributes,
                                &DirectoryString,
@@ -231,9 +231,9 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
                                NULL,
                                NULL);
 
-    //
+
     // Open the directory
-    //
+
     Status = ZwCreateFile(&DirectoryHandle,
                           FILE_LIST_DIRECTORY,
                           &ObjectAttributes,
@@ -251,9 +251,9 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
       return Status;
     }
 
-    //
+
     // Allocate space for directory entry information
-    //
+
     DirectoryInfo = RtlAllocateHeap(RtlGetProcessHeap(), 0, 4096);
     
     if (!DirectoryInfo) 
@@ -261,9 +261,9 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
       return STATUS_INSUFFICIENT_RESOURCES;
     }
 
-    //
+
     // Create the event to wait on
-    //
+
     InitializeObjectAttributes(&ObjectAttributes, NULL, 0, NULL, NULL);
     Status = NtCreateEvent(&EventHandle,
                            EVENT_ALL_ACCESS,
@@ -276,15 +276,15 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
       return Status;
     }
 
-    //
+
     // Start loop
-    //
+
     i = 0;
     for (;;)
     {
-        //
+
         // Get the contents of the directory, adding up the size as we go
-        //
+
         Status = ZwQueryDirectoryFile(DirectoryHandle,
                                       EventHandle,
                                       NULL,
@@ -298,37 +298,37 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
                                       FirstQuery);
         if (Status == STATUS_PENDING)
         {
-            //
+
             // Wait on the event
-            //
+
             NtWaitForSingleObject(EventHandle, FALSE, NULL);
             Status = IoStatusBlock.Status;
         }
 
-        //
+
         // Check for success
-        //
+
         if (!NT_SUCCESS(Status))
         {
-            //
+
             // Nothing left to enumerate. Close handles and free memory
-            //
+
             ZwClose(DirectoryHandle);
             RtlFreeHeap(RtlGetProcessHeap(), 0, DirectoryInfo);
             return STATUS_SUCCESS;
         }
 
-        //
+
         // Loop every directory
-        //
+
         Entry = DirectoryInfo;
 
         
         while(Entry)
         {            
-            //
+
             // List the file
-            //
+
             RtlCliDumpFileInfo(Entry);
 
             if (++i > 20)
@@ -351,21 +351,21 @@ RtlCliListDirectory(PWCHAR CurrentDirectory)
               RtlCliDisplayString("\n");
             }
 
-            //
+
             // Make sure we still have a file
-            //
+
             if (!Entry->NextEntryOffset) break;
 
-            //
+
             // Move to the next one
-            //
+
             Entry = (PFILE_BOTH_DIR_INFORMATION)((ULONG_PTR)Entry +
                                                  Entry->NextEntryOffset);          
         }
 
-        //
+
         // This isn't the first scan anymore
-        //
+
         FirstQuery = FALSE;
     }
 }
