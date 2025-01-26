@@ -19,137 +19,112 @@
 #include "ntfile.h"
 #include "ntreg.h"
 
-
-
-//
 // Device type for input/output
-//
+
 typedef enum _CON_DEVICE_TYPE
 {
     KeyboardType,
     MouseType
 } CON_DEVICE_TYPE;
 
-//
 // Display functions
-//
+
 NTSTATUS
-__cdecl
-RtlCliDisplayString(
+__cdecl RtlCliDisplayString(
     IN PCH Message,
-    ...
-);
+    ...);
 
 NTSTATUS
 RtlCliPrintString(
-    IN PUNICODE_STRING Message
-);
+    IN PUNICODE_STRING Message);
 
 NTSTATUS
 RtlCliPutChar(
-    IN WCHAR Char
-);
+    IN WCHAR Char);
 
-//
 // Input functions
-//
+
 NTSTATUS
 RtlCliOpenInputDevice(
     OUT PHANDLE Handle,
-    IN CON_DEVICE_TYPE Type
-);
+    IN CON_DEVICE_TYPE Type);
 
-CHAR
-RtlCliGetChar(
-    IN HANDLE hDriver
-);
+CHAR RtlCliGetChar(
+    IN HANDLE hDriver);
 
 PCHAR
 RtlCliGetLine(
-    IN HANDLE hDriver
-);
+    IN HANDLE hDriver);
 
-//
 // System information functions
-//
+
 NTSTATUS
 RtlCliListDrivers(
-    VOID
-);
+    VOID);
 
 NTSTATUS
 RtlCliListProcesses(
-    VOID
-);
+    VOID);
 
 NTSTATUS
 RtlCliDumpSysInfo(
-    VOID
-);
+    VOID);
 
 NTSTATUS
 RtlCliShutdown(
-    VOID
-);
+    VOID);
 
 NTSTATUS
 RtlCliReboot(
-    VOID
-);
+    VOID);
 
 NTSTATUS
 RtlCliPowerOff(
-    VOID
-);
+    VOID);
 
-//
 // Hardware functions
-//
+
 NTSTATUS
 RtlCliListHardwareTree(
-    VOID
-);
+    VOID);
 
-//
 // File functions
-//
+
 NTSTATUS
 RtlCliListDirectory(
-    PWCHAR CurrentDirectory
-);
+    PWCHAR CurrentDirectory);
 
 NTSTATUS
 RtlCliSetCurrentDirectory(
-    PCHAR Directory
-);
+    PCHAR Directory);
 
 ULONG
 RtlCliGetCurrentDirectory(
-    IN OUT PWSTR CurrentDirectory
-);
+    IN OUT PWSTR CurrentDirectory);
 
 // Keyboard:
 
 HANDLE hKeyboard;
 
-typedef struct _KBD_RECORD {
-  WORD  wVirtualScanCode;
-  DWORD dwControlKeyState;
-  UCHAR AsciiChar;
-  BOOL  bKeyDown;
+typedef struct _KBD_RECORD
+{
+    WORD wVirtualScanCode;
+    DWORD dwControlKeyState;
+    UCHAR AsciiChar;
+    BOOL bKeyDown;
 } KBD_RECORD, *PKBD_RECORD;
 
 void IntTranslateKey(PKEYBOARD_INPUT_DATA InputData, KBD_RECORD *kbd_rec);
 
-#define RIGHT_ALT_PRESSED     0x0001 // the right alt key is pressed.
-#define LEFT_ALT_PRESSED      0x0002 // the left alt key is pressed.
-#define RIGHT_CTRL_PRESSED    0x0004 // the right ctrl key is pressed.
-#define LEFT_CTRL_PRESSED     0x0008 // the left ctrl key is pressed.
-#define SHIFT_PRESSED         0x0010 // the shift key is pressed.
-#define NUMLOCK_ON            0x0020 // the numlock light is on.
-#define SCROLLLOCK_ON         0x0040 // the scrolllock light is on.
-#define CAPSLOCK_ON           0x0080 // the capslock light is on.
-#define ENHANCED_KEY          0x0100 // the key is enhanced.
+#define RIGHT_ALT_PRESSED 0x0001  // the right alt key is pressed.
+#define LEFT_ALT_PRESSED 0x0002   // the left alt key is pressed.
+#define RIGHT_CTRL_PRESSED 0x0004 // the right ctrl key is pressed.
+#define LEFT_CTRL_PRESSED 0x0008  // the left ctrl key is pressed.
+#define SHIFT_PRESSED 0x0010      // the shift key is pressed.
+#define NUMLOCK_ON 0x0020         // the numlock light is on.
+#define SCROLLLOCK_ON 0x0040      // the scrolllock light is on.
+#define CAPSLOCK_ON 0x0080        // the capslock light is on.
+#define ENHANCED_KEY 0x0100       // the key is enhanced.
 
 // Process:
 
@@ -172,46 +147,34 @@ NTSTATUS RegWrite(HANDLE hKey, INT type, PWCHAR key_name, PVOID data, DWORD size
 
 NTSTATUS RegReadValue(HANDLE hKey, PWCHAR key_name, OUT PULONG type, OUT PVOID data, IN ULONG buf_size, OUT PULONG out_size);
 
-// Misc
-
-// void FillUnicodeStringWithAnsi(OUT PUNICODE_STRING us, IN PCHAR as);
-
 //===========================================================
-//
+
 // Helper Functions for ntreg.c
-//
+
 //===========================================================
 
-BOOLEAN SetUnicodeString (
-  UNICODE_STRING* pustrRet, 
-  WCHAR* pwszData
-  );
-BOOLEAN 
-  DisplayString (
-  WCHAR* pwszData
-  );
-HANDLE 
-  InitHeapMemory (void);
-BOOLEAN 
-  DeinitHeapMemory (
-  HANDLE hHeap
-  );
-PVOID 
-  kmalloc (
-  HANDLE hHeap, 
-  int nSize 
-  );
-BOOLEAN 
-  kfree ( 
-  HANDLE hHeap, 
-  PVOID pMemory 
-  );
-BOOLEAN 
-  AppendString(
-  WCHAR* pszInput, 
-  WCHAR* pszAppend
-  );
-UINT 
-  GetStringLength(
-  WCHAR* pszInput
-  );
+BOOLEAN SetUnicodeString(
+    UNICODE_STRING *pustrRet,
+    WCHAR *pwszData);
+BOOLEAN
+DisplayString(
+    WCHAR *pwszData);
+HANDLE
+InitHeapMemory(void);
+BOOLEAN
+DeinitHeapMemory(
+    HANDLE hHeap);
+PVOID
+kmalloc(
+    HANDLE hHeap,
+    int nSize);
+BOOLEAN
+kfree(
+    HANDLE hHeap,
+    PVOID pMemory);
+BOOLEAN
+AppendString(
+    WCHAR *pszInput,
+    WCHAR *pszAppend);
+UINT GetStringLength(
+    WCHAR *pszInput);

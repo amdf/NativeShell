@@ -8,28 +8,20 @@
 
 #include "precomp.h"
 
-
 // FIXME: Temporary here
 
 NTSTATUS
 RtlClipBackspace(
-    VOID
-);
-
+    VOID);
 
 // Event to wait on for keyboard input
-
 HANDLE hEvent;
-
 
 // Raw keyboard character buffer
 
-//KEYBOARD_INPUT_DATA CurrentCharBuffer[20];
 ULONG CurrentChar = 0;
 
-
 // Input buffer
-
 CHAR Line[1024];
 CHAR CurrentPosition = 0;
 
@@ -59,7 +51,6 @@ RtlCliOpenInputDevice(OUT PHANDLE Handle,
     HANDLE hDriver;
     NTSTATUS Status;
 
-
     // Chose the driver to use
     // FIXME: Support MouseType later
     // FIXME: Don't hardcode keyboard path
@@ -69,18 +60,14 @@ RtlCliOpenInputDevice(OUT PHANDLE Handle,
         RtlInitUnicodeString(&Driver, L"\\Device\\KeyboardClass0");
     }
 
-
     // Initialize the object attributes
-
     InitializeObjectAttributes(&ObjectAttributes,
                                &Driver,
                                OBJ_CASE_INSENSITIVE,
                                NULL,
                                NULL);
 
-
     // Open a handle to it
-
     Status = NtCreateFile(&hDriver,
                           SYNCHRONIZE | GENERIC_READ | FILE_READ_ATTRIBUTES,
                           &ObjectAttributes,
@@ -93,15 +80,11 @@ RtlCliOpenInputDevice(OUT PHANDLE Handle,
                           NULL,
                           0);
 
-
     // Now create an event that will be used to wait on the device
-
     InitializeObjectAttributes(&ObjectAttributes, NULL, 0, NULL, NULL);
     Status = NtCreateEvent(&hEvent, EVENT_ALL_ACCESS, &ObjectAttributes, 1, 0);
 
-
     // Return the handle
-
     *Handle = hDriver;
     return Status;
 }
@@ -134,12 +117,10 @@ RtlClipWaitForInput(IN HANDLE hDriver,
     LARGE_INTEGER ByteOffset;
     NTSTATUS Status;
 
-
     // Clean up the I/O Status block and read from byte 0
 
     RtlZeroMemory(&Iosb, sizeof(Iosb));
     RtlZeroMemory(&ByteOffset, sizeof(ByteOffset));
-
 
     // Try to read the data
 
@@ -153,7 +134,6 @@ RtlClipWaitForInput(IN HANDLE hDriver,
                         &ByteOffset,
                         NULL);
 
-
     // Check if data is pending
 
     if (Status == STATUS_PENDING)
@@ -164,51 +144,36 @@ RtlClipWaitForInput(IN HANDLE hDriver,
         Status = NtWaitForSingleObject(hEvent, TRUE, NULL);
     }
 
-
     // Return status and how much data was read
 
     *BufferSize = (ULONG)Iosb.Information;
     return Status;
 }
 
-/*++
- * @name RtlCliGetChar
- *
- * The RtlCliGetChar routine FILLMEIN
- *
- * @param hDriver
- *        FILLMEIN
- *
- * @return CHAR
- *
- * @remarks Documentation for this routine needs to be completed.
- *
- *--*/
-CHAR
-RtlCliGetChar(IN HANDLE hDriver)
+CHAR RtlCliGetChar(IN HANDLE hDriver)
 {
-  KEYBOARD_INPUT_DATA KeyboardData;
-  KBD_RECORD kbd_rec;
-  ULONG BufferLength = sizeof(KEYBOARD_INPUT_DATA);
+    KEYBOARD_INPUT_DATA KeyboardData;
+    KBD_RECORD kbd_rec;
+    ULONG BufferLength = sizeof(KEYBOARD_INPUT_DATA);
 
-  RtlClipWaitForInput(hDriver, &KeyboardData, &BufferLength);
+    RtlClipWaitForInput(hDriver, &KeyboardData, &BufferLength);
 
-  IntTranslateKey(&KeyboardData, &kbd_rec);
+    IntTranslateKey(&KeyboardData, &kbd_rec);
 
-  if (!kbd_rec.bKeyDown)
-  {
-    return (-1);
-  }
-  return kbd_rec.AsciiChar;
+    if (!kbd_rec.bKeyDown)
+    {
+        return (-1);
+    }
+    return kbd_rec.AsciiChar;
 }
 
 /*++
  * @name RtlCliGetLine
  *
- * The RtlCliGetLine routine FILLMEIN
+ * The RtlCliGetLine routine gets line from keyboard.
  *
  * @param hDriver
- *        FILLMEIN
+ *        Keyboard handle.
  *
  * @return PCHAR
  *
@@ -223,39 +188,26 @@ RtlCliGetLine(IN HANDLE hDriver)
     CHAR Char;
     BOOLEAN First = FALSE;
 
-    //memset(Line, 0x00, 1024);
-
-
     // Wait for a new character
 
     while (TRUE)
     {
-
         // Get the character that was pressed
-
         Char = RtlCliGetChar(hDriver);
 
-
         // Check if this was ENTER
-
         if (Char == '\r')
         {
-
             // First, null-terminate the line buffer
-
             Line[CurrentPosition] = ANSI_NULL;
             CurrentPosition = 0;
 
-
             // Return it
-
             return Line;
         }
         else if (Char == '\b')
         {
-
             // Make sure we don't back-space beyond the limit
-
             if (CurrentPosition)
             {
                 // NtDisplayString does not properly handle backspace, so
@@ -263,44 +215,34 @@ RtlCliGetLine(IN HANDLE hDriver)
 
                 // We have to call in the display subsystem to redisplay the
                 // current text buffer and replace last character with space.
-                
+
                 RtlCliPutChar('\r');
                 RtlClipBackspace();
-                
+
                 RtlCliPutChar(' ');
 
                 RtlCliPutChar('\r');
                 RtlClipBackspace();
 
-
                 // Now we do the only thing we're supposed to do, which is to
                 // remove a character in the command buffer as well.
-
                 CurrentPosition--;
             }
 
-
             // Continue listening for chars.
-
             continue;
         }
 
-
         // We got another character. Make sure it's not NULL.
-
-        if (!Char || Char == -1) continue;
-
+        if (!Char || Char == -1)
+            continue;
 
         // Add it to our line buffer
-
         Line[CurrentPosition] = Char;
         CurrentPosition++;
 
-
         // Again, as noted earlier, we combine input with display in a very
         // unholy way, so we also have to display it on screen.
-
         RtlCliPutChar(Char);
     }
 }
-

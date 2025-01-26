@@ -6,219 +6,231 @@
  * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
  */
 
-#include "precomp.h"
 #include "ntreg.h"
+#include "precomp.h"
 
-WCHAR* NtRegGetRootPath(H_KEY hkRoot) 
+WCHAR *NtRegGetRootPath(H_KEY hkRoot)
 {
-	if (hkRoot == HKEY_LOCAL_MACHINE) {
-		return L"\\Registry\\Machine";
-	} else if (hkRoot == HKEY_CLASSES_ROOT) {
-		return L"\\Registry\\Machine\\SOFTWARE\\Classes";
-	} else if (hkRoot == HKEY_CURRENT_CONFIG) {
-		return L"\\Registry\\Machine\\System\\CurrentControlSet\\Hardware Profiles\\Current";
-	} else if (hkRoot == HKEY_USERS) {
-		return L"\\Registry\\User";
-	}
-	return NULL;
+    if (hkRoot == HKEY_LOCAL_MACHINE)
+    {
+        return L"\\Registry\\Machine";
+    }
+    else if (hkRoot == HKEY_CLASSES_ROOT)
+    {
+        return L"\\Registry\\Machine\\SOFTWARE\\Classes";
+    }
+    else if (hkRoot == HKEY_CURRENT_CONFIG)
+    {
+        return L"\\Registry\\Machine\\System\\CurrentControlSet\\Hardware "
+               L"Profiles\\Current";
+    }
+    else if (hkRoot == HKEY_USERS)
+    {
+        return L"\\Registry\\User";
+    }
+    return NULL;
 }
 
-
-BOOLEAN NtRegOpenKey(HANDLE* phKey, H_KEY hkRoot, WCHAR* pwszSubKey, ACCESS_MASK DesiredAccess)
+BOOLEAN
+NtRegOpenKey(HANDLE *phKey, H_KEY hkRoot, WCHAR *pwszSubKey, ACCESS_MASK DesiredAccess)
 {
-	NTSTATUS				nRet = 0;
-	HANDLE					hReg = 0;
-	UNICODE_STRING			ustrKeyName;
-	WCHAR					wszKeyName[4096] = { 0, };
-	WCHAR*					pwszRootKey = NULL;
-	OBJECT_ATTRIBUTES		ObjectAttributes;
-	
-	pwszRootKey = NtRegGetRootPath(hkRoot);
-	if(!pwszRootKey) {
-		return FALSE;
-	}
+    NTSTATUS nRet = 0;
+    HANDLE hReg = 0;
+    UNICODE_STRING ustrKeyName;
+    WCHAR wszKeyName[4096] = {
+        0,
+    };
+    WCHAR *pwszRootKey = NULL;
+    OBJECT_ATTRIBUTES ObjectAttributes;
 
-	// Set RootKey
-	AppendString(wszKeyName, pwszRootKey);
+    pwszRootKey = NtRegGetRootPath(hkRoot);
+    if (!pwszRootKey)
+    {
+        return FALSE;
+    }
 
-	// Set SubKey
-	AppendString(wszKeyName, L"\\");
-	AppendString(wszKeyName, pwszSubKey);
+    // Set RootKey
+    AppendString(wszKeyName, pwszRootKey);
 
-	// Setup Unicode String
-	SetUnicodeString(&ustrKeyName, wszKeyName);
+    // Set SubKey
+    AppendString(wszKeyName, L"\\");
+    AppendString(wszKeyName, pwszSubKey);
 
-	//printf("'%S'\n", ustrKeyName.Buffer);
-	InitializeObjectAttributes(&ObjectAttributes,
-		&ustrKeyName,
-		OBJ_CASE_INSENSITIVE,
-		NULL,
-		NULL);
+    // Setup Unicode String
+    SetUnicodeString(&ustrKeyName, wszKeyName);
 
+    // printf("'%S'\n", ustrKeyName.Buffer);
+    InitializeObjectAttributes(&ObjectAttributes, &ustrKeyName, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
-	nRet = NtOpenKey(phKey,
-		DesiredAccess,
-		&ObjectAttributes);
-	
-	if(!NT_SUCCESS(nRet)) {
-		RtlCliDisplayString("NtOpenKey Error : %X\n", nRet);
-		return FALSE;
-	}
-	return TRUE;
+    nRet = NtOpenKey(phKey, DesiredAccess, &ObjectAttributes);
+
+    if (!NT_SUCCESS(nRet))
+    {
+        RtlCliDisplayString("NtOpenKey Error : %X\n", nRet);
+        return FALSE;
+    }
+    return TRUE;
 }
 
-BOOLEAN NtRegWriteValue(HANDLE hKey, WCHAR* pwszValueName, PVOID pData, ULONG uLength, DWORD dwRegType)
+BOOLEAN
+NtRegWriteValue(HANDLE hKey, WCHAR *pwszValueName, PVOID pData, ULONG uLength, DWORD dwRegType)
 {
-	UNICODE_STRING			ustrValueName;
-	NTSTATUS				nRet;
+    UNICODE_STRING ustrValueName;
+    NTSTATUS nRet;
 
-	SetUnicodeString(&ustrValueName, pwszValueName);
+    SetUnicodeString(&ustrValueName, pwszValueName);
 
-	nRet = NtSetValueKey( hKey, 
-						  &ustrValueName, 
-						  0, 
-						  dwRegType,		// i.e. REG_BINARY
-						  pData, 
-						  uLength);
+    nRet = NtSetValueKey(hKey, &ustrValueName, 0,
+                         dwRegType, // i.e. REG_BINARY
+                         pData, uLength);
 
-	//printf("NtRegWriteValue : %X\n", nRet);
-	if (!NT_SUCCESS(nRet)) 
-  {
-		return FALSE;
-	}
+    // printf("NtRegWriteValue : %X\n", nRet);
+    if (!NT_SUCCESS(nRet))
+    {
+        return FALSE;
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
-BOOLEAN NtRegWriteString(HANDLE hKey, WCHAR* pwszValueName, WCHAR* pwszValue)
+BOOLEAN
+NtRegWriteString(HANDLE hKey, WCHAR *pwszValueName, WCHAR *pwszValue)
 {
-	BOOLEAN bRet = FALSE;
+    BOOLEAN bRet = FALSE;
 
-	bRet = NtRegWriteValue(
-							hKey, pwszValueName, 
-							pwszValue, (GetStringLength(pwszValue) + 1) * sizeof(WCHAR), REG_SZ
-						  );
+    bRet = NtRegWriteValue(hKey, pwszValueName, pwszValue, (GetStringLength(pwszValue) + 1) * sizeof(WCHAR), REG_SZ);
 
-	return bRet;
+    return bRet;
 }
 
-BOOLEAN NtRegDeleteValue(HANDLE hKey, WCHAR* pwszValueName) 
+BOOLEAN
+NtRegDeleteValue(HANDLE hKey, WCHAR *pwszValueName)
 {
-	UNICODE_STRING ustrValueName;
-	int nRet = 0;
+    UNICODE_STRING ustrValueName;
+    int nRet = 0;
 
-	SetUnicodeString(&ustrValueName, pwszValueName);
+    SetUnicodeString(&ustrValueName, pwszValueName);
 
-	nRet = NtDeleteValueKey( hKey, &ustrValueName );
-	if(!NT_SUCCESS(nRet)) {
-		return FALSE;
-	}
+    nRet = NtDeleteValueKey(hKey, &ustrValueName);
+    if (!NT_SUCCESS(nRet))
+    {
+        return FALSE;
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
-BOOLEAN NtRegReadValue(HANDLE hKey, HANDLE hHeapHandle, WCHAR* pszValueName, PKEY_VALUE_PARTIAL_INFORMATION* pRetBuffer, ULONG* pRetBufferSize)
+BOOLEAN
+NtRegReadValue(HANDLE hKey, HANDLE hHeapHandle, WCHAR *pszValueName, PKEY_VALUE_PARTIAL_INFORMATION *pRetBuffer,
+               ULONG *pRetBufferSize)
 {
-	UNICODE_STRING ustrValueName;
-	BYTE* pBuffer = NULL;
-	ULONG uSize = 1024;
-	ULONG uRetSize;
-	NTSTATUS ntStatus = 0;
-	int i = 0;
-	
-	SetUnicodeString(&ustrValueName, pszValueName);
+    UNICODE_STRING ustrValueName;
+    BYTE *pBuffer = NULL;
+    ULONG uSize = 1024;
+    ULONG uRetSize;
+    NTSTATUS ntStatus = 0;
+    int i = 0;
 
-	for(i = 0; i < 4096; i++) {
-		pBuffer = kmalloc(hHeapHandle, uSize);
-	
-		ntStatus = NtQueryValueKey( hKey, &ustrValueName, KeyValuePartialInformation , pBuffer, uSize, &uRetSize);
+    SetUnicodeString(&ustrValueName, pszValueName);
 
-		if( ntStatus == STATUS_SUCCESS ) {
-			break;
-		} else if(ntStatus == STATUS_INVALID_PARAMETER) {
-			kfree(hHeapHandle, pBuffer);
-			pBuffer = NULL;
+    for (i = 0; i < 4096; i++)
+    {
+        pBuffer = kmalloc(hHeapHandle, uSize);
 
-			return FALSE;
-		}
+        ntStatus = NtQueryValueKey(hKey, &ustrValueName, KeyValuePartialInformation, pBuffer, uSize, &uRetSize);
 
-		kfree(hHeapHandle, pBuffer);
-		pBuffer = NULL;
+        if (ntStatus == STATUS_SUCCESS)
+        {
+            break;
+        }
+        else if (ntStatus == STATUS_INVALID_PARAMETER)
+        {
+            kfree(hHeapHandle, pBuffer);
+            pBuffer = NULL;
 
-		uSize += 4;		
-	}
+            return FALSE;
+        }
 
-	*pRetBuffer = (PKEY_VALUE_PARTIAL_INFORMATION)pBuffer;
-	*pRetBufferSize = uSize;
+        kfree(hHeapHandle, pBuffer);
+        pBuffer = NULL;
 
-	return TRUE;
+        uSize += 4;
+    }
+
+    *pRetBuffer = (PKEY_VALUE_PARTIAL_INFORMATION)pBuffer;
+    *pRetBufferSize = uSize;
+
+    return TRUE;
 }
 
-BOOLEAN NtRegCloseKey(HANDLE hKey)
+BOOLEAN
+NtRegCloseKey(HANDLE hKey)
 {
-	int nRet = 0;
-	
-	nRet = NtClose(hKey);
+    int nRet = 0;
 
-	if(!NT_SUCCESS(nRet)) {
-		return FALSE;
-	}
+    nRet = NtClose(hKey);
 
-	return TRUE;
+    if (!NT_SUCCESS(nRet))
+    {
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
 void NtEnumKey(HANDLE hKey)
 {
-	NTSTATUS nRet = 0;
-  char buf[BUFFER_SIZE];
-	PKEY_VALUE_BASIC_INFORMATION pbi;
-  PKEY_NODE_INFORMATION pki;
-  ULONG ResultLength;
-	UINT i;
+    NTSTATUS nRet = 0;
+    char buf[BUFFER_SIZE];
+    PKEY_VALUE_BASIC_INFORMATION pbi;
+    PKEY_NODE_INFORMATION pki;
+    ULONG ResultLength;
+    UINT i;
 
-  RtlCliDisplayString("=========\n");
-  
-  i = 0;
-  memset(buf, 0x00, BUFFER_SIZE);
-  pki = (PKEY_NODE_INFORMATION)buf;
-  
-  while (STATUS_SUCCESS == NtEnumerateKey(hKey, i++, KeyNodeInformation, pki, BUFFER_SIZE, &ResultLength))
-  {
-    if (pki->NameLength)
-    {
-      RtlCliDisplayString("[%S]\n", pki->Name);
-    }
-    else
-    {
-      RtlCliDisplayString("[null]\n");
-    }
+    RtlCliDisplayString("=========\n");
+
+    i = 0;
     memset(buf, 0x00, BUFFER_SIZE);
-  }
+    pki = (PKEY_NODE_INFORMATION)buf;
 
-  RtlCliDisplayString("---------\n");
+    while (STATUS_SUCCESS == NtEnumerateKey(hKey, i++, KeyNodeInformation, pki, BUFFER_SIZE, &ResultLength))
+    {
+        if (pki->NameLength)
+        {
+            RtlCliDisplayString("[%S]\n", pki->Name);
+        }
+        else
+        {
+            RtlCliDisplayString("[null]\n");
+        }
+        memset(buf, 0x00, BUFFER_SIZE);
+    }
 
-  i = 0;
-  memset(buf, 0x00, BUFFER_SIZE);
-  pbi = (PKEY_VALUE_BASIC_INFORMATION)buf;
-  
-  while (STATUS_SUCCESS == NtEnumerateValueKey(hKey, i++, KeyValueBasicInformation, pbi, BUFFER_SIZE, &ResultLength))
-  {
-    RtlCliDisplayString((pbi->Type == REG_SZ) 
-      ? " REG_SZ" : (pbi->Type == REG_MULTI_SZ) 
-      ? " REG_MULTI_SZ" : (pbi->Type == REG_DWORD)
-      ? " REG_DWORD" : "Other type (%d)", pbi->Type);
-    if (pbi->NameLength)
-    {
-      RtlCliDisplayString("    %S\n", pbi->Name);
-    }
-    else
-    {
-      RtlCliDisplayString("    (null)\n");
-    }
+    RtlCliDisplayString("---------\n");
+
+    i = 0;
     memset(buf, 0x00, BUFFER_SIZE);
-  }
+    pbi = (PKEY_VALUE_BASIC_INFORMATION)buf;
 
-  RtlCliDisplayString("=========\n");
+    while (STATUS_SUCCESS == NtEnumerateValueKey(hKey, i++, KeyValueBasicInformation, pbi, BUFFER_SIZE, &ResultLength))
+    {
+        RtlCliDisplayString((pbi->Type == REG_SZ)         ? " REG_SZ"
+                            : (pbi->Type == REG_MULTI_SZ) ? " REG_MULTI_SZ"
+                            : (pbi->Type == REG_DWORD)    ? " REG_DWORD"
+                                                          : "Other type (%d)",
+                            pbi->Type);
+        if (pbi->NameLength)
+        {
+            RtlCliDisplayString("    %S\n", pbi->Name);
+        }
+        else
+        {
+            RtlCliDisplayString("    (null)\n");
+        }
+        memset(buf, 0x00, BUFFER_SIZE);
+    }
 
-	return;
+    RtlCliDisplayString("=========\n");
+
+    return;
 }
