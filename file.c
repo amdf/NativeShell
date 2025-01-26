@@ -1,31 +1,11 @@
-/*++
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            file.c
+ * DESCRIPTION:     This module implements commands for dealing with files and directories.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
 
-Copyright (c) Alex Ionescu.  All rights reserved.
-Copyright (c) 2011 amdf.
-
-    THIS CODE AND INFORMATION IS PROVIDED UNDER THE LESSER GNU PUBLIC LICENSE.
-    PLEASE READ THE FILE "LICENSE" IN THE TOP LEVEL DIRECTORY.
-
-Module Name:
-
-    file.c
-
-Abstract:
-
-    The Native Command Line Interface (NCLI) is the command shell for the
-    TinyKRNL OS.
-    This module implements commands for dealing with files and directories.
-
-Environment:
-
-    Native
-
-Revision History:
-
-    Alex Ionescu - Started Implementation - 23-Mar-06
-    amdf - changed RtlCliSetCurrentDirectory - 20-Feb-11
-
---*/
 #include "precomp.h"
 
 /*++

@@ -1,32 +1,11 @@
-/*++
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            input.c
+ * DESCRIPTION:     This module deals with device input (such as mouse or keyboard).
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
 
-Copyright (c) Alex Ionescu.  All rights reserved.
-Copyright (c) 2011 amdf.
-
-    THIS CODE AND INFORMATION IS PROVIDED UNDER THE LESSER GNU PUBLIC LICENSE.
-    PLEASE READ THE FILE "LICENSE" IN THE TOP LEVEL DIRECTORY.
-
-Module Name:
-
-    input.c
-
-Abstract:
-
-    The Native Command Line Interface (NCLI) is the command shell for the
-    TinyKRNL OS.
-    This module deals with device input (such as mouse or keyboard).
-
-Environment:
-
-    Native mode
-
-Revision History:
-
-    Alex Ionescu - Started Implementation - 01-Mar-06
-    Alex Ionescu - Reworked architecture - 23-Mar-06
-    amdf - Added correct scancode translation in RtlCliGetChar - 20-Feb-11
-
---*/
 #include "precomp.h"
 
 //

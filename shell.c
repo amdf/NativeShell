@@ -1,3 +1,11 @@
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            shell.c
+ * DESCRIPTION:     Shell helper functions.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
+
 #include "precomp.h"
 
 /*
@@ -288,20 +296,3 @@ UINT GetStringLength(WCHAR* pszInput)
 
 	return i;
 }
-
-// Note: This function allocates memory for "us" variable.
-// void FillUnicodeStringWithAnsi(OUT PUNICODE_STRING us, IN PCHAR as)
-// {  
-//   ANSI_STRING ansi_string;
-
-//   RtlInitAnsiString(&ansi_string, as);
-
-//   if (!NT_SUCCESS(RtlAnsiStringToUnicodeString(us, &ansi_string, TRUE)))
-//   {
-//     RtlCliDisplayString("RtlAnsiStringToUnicodeString() failed\n");
-//     return;
-//   }
-
-//   RtlFreeAnsiString(&ansi_string);
-//   return;
-// }

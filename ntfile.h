@@ -2,10 +2,7 @@
 #ifndef NATIVEFILE_FUNCTIONS_H
 #define NATIVEFILE_FUNCTIONS_H 1
 
-//#define DEBUGMODE
-
-#include <ntndk.h> // include this for its native functions and defn's
-//#include "stdio.h"
+#include <ntndk.h>
 
 BOOLEAN NtFileOpenFile(HANDLE* phRetFile, WCHAR* pwszFileName, BOOLEAN bWrite, BOOLEAN bOverwrite);
 BOOLEAN NtFileOpenDirectory(HANDLE* phRetFile, WCHAR* pwszFileName, BOOLEAN bWrite, BOOLEAN bOverwrite);

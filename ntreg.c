@@ -1,5 +1,10 @@
-
-//#define DEBUGMODE
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            ntreg.c
+ * DESCRIPTION:     Registry operations.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
 
 #include "precomp.h"
 #include "ntreg.h"
@@ -217,4 +222,3 @@ void NtEnumKey(HANDLE hKey)
 
 	return;
 }
-

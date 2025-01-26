@@ -1,29 +1,11 @@
-/*++
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            sysinfo.c
+ * DESCRIPTION:     This module implements commands for displaying system information.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
 
-Copyright (c) Alex Ionescu.  All rights reserved.
-
-    THIS CODE AND INFORMATION IS PROVIDED UNDER THE LESSER GNU PUBLIC LICENSE.
-    PLEASE READ THE FILE "LICENSE" IN THE TOP LEVEL DIRECTORY.
-
-Module Name:
-
-    sysinfo.c
-
-Abstract:
-
-    The Native Command Line Interface (NCLI) is the command shell for the
-    TinyKRNL OS.
-    This module implements commands for displaying system information.
-
-Environment:
-
-    Native mode
-
-Revision History:
-
-    Alex Ionescu - Started Implementation - 23-Mar-06
-
---*/
 #include "precomp.h"
 
 /*++

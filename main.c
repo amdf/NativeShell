@@ -1,42 +1,20 @@
-/*++
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            main.c
+ * DESCRIPTION:     This module handles the main command line interface and command parsing.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
 
-Copyright (c) Alex Ionescu.  All rights reserved.
-Copyright (c) 2011 amdf.
-
-    THIS CODE AND INFORMATION IS PROVIDED UNDER THE LESSER GNU PUBLIC LICENSE.
-    PLEASE READ THE FILE "LICENSE" IN THE TOP LEVEL DIRECTORY.
-
-Module Name:
-
-    main.c
-
-Abstract:
-
-    The Native Command Line Interface (NCLI) is the command shell for the
-    TinyKRNL OS.
-    This module handles the main command line interface and command parsing.
-
-Environment:
-
-    Native mode
-
-Revision History:
-
-    Alex Ionescu - Started Implementation - 01-Mar-06
-    Alex Ionescu - Reworked architecture - 23-Mar-06
-    amdf         - Added process launch command - 25-Jan-11
-    amdf         - Added move command - 20-Feb-11
-
---*/
 #include "precomp.h"
 
 HANDLE hKeyboard;
 HANDLE hHeap;
 HANDLE hKey;
 
-#define __APP_VER__ "0.13.2"
+#define __APP_VER__ "0.13.3"
 #if defined(_M_AMD64) || defined(_AMD64_)
-#define __NCLI_VER__ __APP_VER__ "-alpha x64"
+#define __NCLI_VER__ __APP_VER__ " x64"
 #else
 #define __NCLI_VER__ __APP_VER__ " x86"
 #endif

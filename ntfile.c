@@ -1,5 +1,10 @@
-
-//#define DEBUGMODE
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            ntfile.c
+ * DESCRIPTION:     File operations.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
 
 #include "precomp.h"
 #include "ntfile.h"

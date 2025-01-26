@@ -1,3 +1,11 @@
+/**
+ * PROJECT:         Native Shell
+ * COPYRIGHT:       LGPL; See LICENSE in the top level directory
+ * FILE:            process.c
+ * DESCRIPTION:     Create process implementation.
+ * DEVELOPERS:      See CONTRIBUTORS.md in the top level directory
+ */
+
 #include "precomp.h"
 
 /*

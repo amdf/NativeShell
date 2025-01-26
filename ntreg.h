@@ -2,9 +2,7 @@
 #ifndef NATIVEREGISTRY_FUNCTIONS_H
 #define NATIVEREGISTRY_FUNCTIONS_H 1
 
-//#define DEBUGMODE
-
-#include <ntndk.h> // include this for its native functions and defn's
+#include <ntndk.h>
 
 #define HKEY_CLASSES_ROOT           0x80000000
 #define HKEY_CURRENT_USER           0x80000001
