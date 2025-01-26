@@ -12,7 +12,7 @@ HANDLE hKeyboard;
 HANDLE hHeap;
 HANDLE hKey;
 
-#define __APP_VER__ "0.13.3"
+#define __APP_VER__ "0.14.0"
 #if defined(_M_AMD64) || defined(_AMD64_)
 #define __NCLI_VER__ __APP_VER__ " x64"
 #else
