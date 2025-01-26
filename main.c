@@ -40,9 +40,7 @@ WCHAR *helpstr[] =
 
 VOID RtlClipProcessMessage(PCHAR Command)
 {
-    WCHAR CurrentDirectory[MAX_PATH];
-    WCHAR buf1[MAX_PATH];
-    WCHAR buf2[MAX_PATH];
+    WCHAR CurrentDirectory[MAX_PATH] = {0};
     UNICODE_STRING CurrentDirectoryString;
     CHAR CommandBuf[BUFFER_SIZE] = {0};
     UINT argc;
@@ -207,8 +205,10 @@ VOID RtlClipProcessMessage(PCHAR Command)
         // Copy file
         if (argc > 2)
         {
-            GetFullPath(argv[2], buf1, FALSE);
-            GetFullPath(argv[3], buf2, FALSE);
+            WCHAR buf1[MAX_PATH] = {0};
+            WCHAR buf2[MAX_PATH] = {0};
+            GetFullPath(argv[1], buf1, FALSE);
+            GetFullPath(argv[2], buf2, FALSE);
             RtlCliDisplayString("\nCopy %S to %S\n", buf1, buf2);
             if (FileExists(buf1))
             {
@@ -232,8 +232,10 @@ VOID RtlClipProcessMessage(PCHAR Command)
         // Move/rename file
         if (argc > 2)
         {
-            GetFullPath(argv[2], buf1, FALSE);
-            GetFullPath(argv[3], buf2, FALSE);
+            WCHAR buf1[MAX_PATH] = {0};
+            WCHAR buf2[MAX_PATH] = {0};
+            GetFullPath(argv[1], buf1, FALSE);
+            GetFullPath(argv[2], buf2, FALSE);
             RtlCliDisplayString("\nMove %S to %S\n", buf1, buf2);
             if (FileExists(buf1))
             {
@@ -257,7 +259,8 @@ VOID RtlClipProcessMessage(PCHAR Command)
         // Delete file
         if (argc > 1)
         {
-            GetFullPath(argv[2], buf1, FALSE);
+            WCHAR buf1[MAX_PATH] = {0};
+            GetFullPath(argv[1], buf1, FALSE);
             if (FileExists(buf1))
             {
                 RtlCliDisplayString("\nDelete %S\n", buf1);
@@ -282,7 +285,8 @@ VOID RtlClipProcessMessage(PCHAR Command)
         // Make directory
         if (argc > 1)
         {
-            GetFullPath(argv[2], buf1, FALSE);
+            WCHAR buf1[MAX_PATH] = {0};
+            GetFullPath(argv[1], buf1, FALSE);
 
             RtlCliDisplayString("\nCreate directory %S\n", buf1);
 
