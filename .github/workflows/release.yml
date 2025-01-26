@@ -40,7 +40,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/i386/nativeshell.zip
-          asset_name: nativeshell-${GITHUB_REF##*/}.i386.zip
+          asset_name: nativeshell-${{ github.ref_name }}.i386.zip
           asset_content_type: application/zip
       - name: Download amd64 binary 
         uses: actions/download-artifact@v4
@@ -57,6 +57,6 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/amd64/nativeshell.zip
-          asset_name: nativeshell-${GITHUB_REF_NAME}.amd64.zip
+          asset_name: nativeshell-${{ github.ref_name }}.amd64.zip
           asset_content_type: application/zip
     
