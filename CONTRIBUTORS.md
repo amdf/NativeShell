@@ -1,0 +1,4 @@
+- Alex Ionescu (the original creator)
+- amdf
+- ReactOS Team (keyboard translation code parts)
+- Dmitri Arkhangelski (code parts from ZenWINX library)
