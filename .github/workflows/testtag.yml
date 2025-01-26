@@ -12,5 +12,10 @@ jobs:
     steps:
       - name: Print Tag
         run: |
-         echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
-         echo "Tag name from github.ref_name: ${{  github.ref_name }}"
+          echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
+          echo "Tag name from github.ref_name: ${{  github.ref_name }}"
+      - name: Print Tag 2
+        run: |
+          git fetch --tags --force
+          latest_tag=$(git describe --tags --abbrev=0)
+          
