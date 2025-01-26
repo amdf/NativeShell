@@ -214,7 +214,7 @@ RtlCliDumpFileInfo(PFILE_BOTH_DIR_INFORMATION DirInfo)
  *
  *--*/
 NTSTATUS
-RtlCliListDirectory(VOID)
+RtlCliListDirectory(PWCHAR CurrentDirectory)
 {
     UNICODE_STRING DirectoryString;
     OBJECT_ATTRIBUTES ObjectAttributes;
@@ -222,19 +222,13 @@ RtlCliListDirectory(VOID)
     NTSTATUS Status;
     IO_STATUS_BLOCK IoStatusBlock;
     BOOLEAN FirstQuery = TRUE;
-    WCHAR CurrentDirectory[MAX_PATH];
+
     PFILE_BOTH_DIR_INFORMATION DirectoryInfo, Entry;
     HANDLE EventHandle;
     CHAR i, c;
 
     //
-    // For now, we only support the current directory (ie: you can't dir e:\
-    // without CDing into it first
-    //
-    RtlCliGetCurrentDirectory(CurrentDirectory);
-
-    //
-    // Convert it to NT Format
+    // Convert dir to NT Format
     //
     if (!RtlDosPathNameToNtPathName_U(CurrentDirectory,
                                       &DirectoryString,

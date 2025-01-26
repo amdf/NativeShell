@@ -132,7 +132,7 @@ RtlCliListHardwareTree(
 //
 NTSTATUS
 RtlCliListDirectory(
-    VOID
+    PWCHAR CurrentDirectory
 );
 
 NTSTATUS
@@ -173,13 +173,11 @@ void IntTranslateKey(PKEYBOARD_INPUT_DATA InputData, KBD_RECORD *kbd_rec);
 NTSTATUS CreateNativeProcess(IN PCWSTR file_name, IN PCWSTR cmd_line, OUT PHANDLE hProcess);
 
 #define BUFFER_SIZE 1024
+#define NUM_ARGS 256
 
 // Command processing:
-
-UINT StringToArguments(CHAR *str);
-
-char *xargv[BUFFER_SIZE];
-unsigned int xargc;
+#define CMDSTR(x) x, strlen(x)
+CHAR **StringToArguments(CHAR *string, UINT *argc);
 
 BOOL GetFullPath(IN PCSTR filename, OUT PWSTR out, IN BOOL add_slash);
 BOOL FileExists(PCWSTR fname);

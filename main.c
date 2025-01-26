@@ -82,73 +82,68 @@ RtlClipProcessMessage(PCHAR Command)
     WCHAR buf1[MAX_PATH];
     WCHAR buf2[MAX_PATH];
     UNICODE_STRING CurrentDirectoryString;
-    CHAR CommandBuf[BUFFER_SIZE];
+    CHAR CommandBuf[BUFFER_SIZE] = {0};
+    UINT argc;
+    CHAR **argv;
 
-    //
-    // Copy command line and break it to arguments
-    //
-    // if xargc = 3, then xargv[1], xargv[2], xargv[3] are available
-    // xargv[1] is a command name, xargv[2] is the first parameter
-
-    memset(CommandBuf, 0x00, BUFFER_SIZE);
     strncpy(CommandBuf, Command, strnlen(Command, BUFFER_SIZE));
-    StringToArguments(CommandBuf);
 
-    //
-    // We'll call the handler for each command
-    //
-    if (!_strnicmp(Command, "exit", 4))
+    argv = StringToArguments(&CommandBuf[0], &argc);
+    
+    if (0 == argc)
+      return;
+
+    if (!_strnicmp(argv[0], CMDSTR("exit")))
     {
-        //
         // Exit from shell
-        //
         DeinitHeapMemory( hHeap );
         NtTerminateProcess(NtCurrentProcess(), 0);
     }
-    else if (!_strnicmp(Command, "test", 4))
+    else if (!_strnicmp(argv[0], CMDSTR("argtest")))
     {
       UINT i = 0;
       
-      RtlCliDisplayString("Args: %d\n", xargc);
-      for (i = 1; i < xargc; i++)
-      {        
-        RtlCliDisplayString("Arg %d: %s\n", i, xargv[i]);
+      RtlCliDisplayString("Args: %d\n", argc);
+
+      if (argc > 1)
+      {
+        for (i = 1; i < argc; i++)
+        {        
+          if (NULL != argv[i])
+            RtlCliDisplayString("Arg %d: %s\n", i, argv[i]);
+          else {
+            RtlCliDisplayString("Arg %d: NULL\n", i);
+            break;
+          }
+        }
       }
     }
-    else if (!_strnicmp(Command, "help", 4))
+    else if (!_strnicmp(argv[0], CMDSTR("help")))
     {
         RtlCliDisplayString("%S", helpstr[0]);
         RtlCliDisplayString("%S", helpstr[1]);
     }
-    else if (!_strnicmp(Command, "lm", 2))
+    else if (!_strnicmp(argv[0], CMDSTR("lm")))
     {
-        //
         // List Modules (!lm)
-        //
         RtlCliListDrivers();
     }
-    else if (!_strnicmp(Command, "lp", 2))
+    else if (!_strnicmp(argv[0], CMDSTR("lp")))
     {
-        //
         // List Processes (!lp)
-        //
         RtlCliListProcesses();
     }
-    else if (!_strnicmp(Command, "sysinfo", 7))
+    else if (!_strnicmp(argv[0], CMDSTR("sysinfo")))
     {
-        //
         // Dump System Information (sysinfo)
-        //
         RtlCliDumpSysInfo();
     }
-    else if (!_strnicmp(Command, "cd", 2))
+    else if (!_strnicmp(argv[0], CMDSTR("cd")))
     {
-        //
         // Set the current directory
-        //
         RtlCliSetCurrentDirectory(&Command[3]);
     }
-    else if (!_strnicmp(Command, "drawtext", 8))
+    else if (!_strnicmp(argv[0], CMDSTR("drawtext")))
     {
 #if (NTDDI_VERSION >= NTDDI_WIN7)
         UNICODE_STRING us;
@@ -161,46 +156,54 @@ RtlClipProcessMessage(PCHAR Command)
         RtlCliDisplayString("\nNot supported prior to Win7\n");
 #endif
     }
-    else if (!_strnicmp(Command, "pwd", 3))
+    else if (!_strnicmp(argv[0], CMDSTR("pwd")))
     {
-        //
         // Get the current directory
-        //
         RtlCliGetCurrentDirectory(CurrentDirectory);
 
-        //
         // Display it
-        //
         RtlInitUnicodeString(&CurrentDirectoryString, CurrentDirectory);
         RtlCliPrintString(&CurrentDirectoryString);
     }
-    else if (!_strnicmp(Command, "dir", 3))
+    else if (!_strnicmp(argv[0], CMDSTR("dir")))
     {
-        //
-        // List the current directory
-        //
-        RtlCliListDirectory();
+      WCHAR Dir[MAX_PATH];
+      WCHAR ArgDir[MAX_PATH];
+      RtlCliGetCurrentDirectory(Dir);
+      if (argc > 1)
+      {
+        UNICODE_STRING us;
+        ANSI_STRING as;
+        RtlInitAnsiString(&as, argv[1]);
+        RtlAnsiStringToUnicodeString(&us, &as, TRUE);
+
+        AppendString(Dir, L"\\");
+        AppendString(Dir, us.Buffer);
+        
+        RtlFreeUnicodeString(&us);
+      }
+      
+      // List directory
+      RtlCliListDirectory(Dir);
     }
-    else if (!_strnicmp(Command, "devtree", 7))
+    else if (!_strnicmp(argv[0], CMDSTR("devtree")))
     {
-        //
         // Dump hardware tree
-        //
         RtlCliListHardwareTree();
     }
-    else if (!_strnicmp(Command, "shutdown", 8))
+    else if (!_strnicmp(argv[0], CMDSTR("shutdown")))
     {
       RtlCliShutdown();
     }
-    else if (!_strnicmp(Command, "reboot", 6))
+    else if (!_strnicmp(argv[0], CMDSTR("reboot")))
     {
       RtlCliReboot();
     }
-    else if (!_strnicmp(Command, "poweroff", 6))
+    else if (!_strnicmp(argv[0], CMDSTR("poweroff")))
     {
       RtlCliPowerOff();
     }
-    else if (!_strnicmp(Command, "vid", 6))
+    else if (!_strnicmp(argv[0], CMDSTR("vid")))
     {
       UINT j;
       WCHAR i, w;
@@ -236,13 +239,13 @@ RtlClipProcessMessage(PCHAR Command)
         }
       }
     }  
-    else if (!_strnicmp(Command, "copy", 4))
+    else if (!_strnicmp(argv[0], CMDSTR("copy")))
     {
       // Copy file
-      if (xargc > 2)
+      if (argc > 2)
       {        
-        GetFullPath(xargv[2], buf1, FALSE);
-        GetFullPath(xargv[3], buf2, FALSE);
+        GetFullPath(argv[2], buf1, FALSE);
+        GetFullPath(argv[3], buf2, FALSE);
         RtlCliDisplayString("\nCopy %S to %S\n", buf1, buf2);
         if (FileExists(buf1))
         {
@@ -260,13 +263,13 @@ RtlClipProcessMessage(PCHAR Command)
         RtlCliDisplayString("Not enough arguments.\n");
       }
     }
-    else if (!_strnicmp(Command, "move", 4))
+    else if (!_strnicmp(argv[0], CMDSTR("move")))
     {
       // Move/rename file
-      if (xargc > 2)
+      if (argc > 2)
       {        
-        GetFullPath(xargv[2], buf1, FALSE);
-        GetFullPath(xargv[3], buf2, FALSE);
+        GetFullPath(argv[2], buf1, FALSE);
+        GetFullPath(argv[3], buf2, FALSE);
         RtlCliDisplayString("\nMove %S to %S\n", buf1, buf2);
         if (FileExists(buf1))
         {
@@ -284,12 +287,12 @@ RtlClipProcessMessage(PCHAR Command)
         RtlCliDisplayString("Not enough arguments.\n");
       }
     }
-    else if (!_strnicmp(Command, "del", 3))
+    else if (!_strnicmp(argv[0], CMDSTR("del")))
     {
       // Delete file
-      if (xargc > 1)
+      if (argc > 1)
       {        
-        GetFullPath(xargv[2], buf1, FALSE);
+        GetFullPath(argv[2], buf1, FALSE);
         if (FileExists(buf1))
         {
           RtlCliDisplayString("\nDelete %S\n", buf1);
@@ -308,12 +311,12 @@ RtlClipProcessMessage(PCHAR Command)
         RtlCliDisplayString("Not enough arguments.\n");
       }
     }
-    else if (!_strnicmp(Command, "md", 2))
+    else if (!_strnicmp(argv[0], CMDSTR("md")))
     {
       // Make directory
-      if (xargc > 1)
+      if (argc > 1)
       {        
-        GetFullPath(xargv[2], buf1, FALSE);
+        GetFullPath(argv[2], buf1, FALSE);
 
         RtlCliDisplayString("\nCreate directory %S\n", buf1);
 
@@ -327,39 +330,55 @@ RtlClipProcessMessage(PCHAR Command)
       }
     }
     else
+    if ((strlen(argv[0]) == 2) && (argv[0][1] == ':'))
     {
-        //
-        // Unknown command, try to find an executable and run it.
-        // Executable name should be with an .exe extension.
-        //
-        
-        WCHAR filename[MAX_PATH];
+      // Change disk
+      RtlCliSetCurrentDirectory(argv[0]);
+      return;
+    } else
+    {      
+      // Unknown command, try to find an executable and run it.
+      WCHAR filename[MAX_PATH] = {0};
+      BOOL bExist = FALSE;
+
+      GetFullPath(argv[0], filename, FALSE);
+
+      bExist = FileExists(filename);
+      if (!bExist)
+      {
+        UINT uOrigLen = wcslen(filename);
+        // RtlCliDisplayString("Not exist '%S'\n", filename);
+        wcscat(filename, L".exe");
+        bExist = FileExists(filename);
+        // if (!bExist)
+        //   RtlCliDisplayString("Not exist '%S'\n", filename);
+      }
+
+      if (bExist)
+      {
+        HANDLE hProcess;
+        NTSTATUS status;
         ANSI_STRING as;
         UNICODE_STRING us;
-        HANDLE hProcess;
+        RtlInitAnsiString(&as, Command);
+        RtlAnsiStringToUnicodeString(&us, &as, TRUE);
+        
+        NtClose(hKeyboard);
 
-        GetFullPath(IN xargv[1], OUT filename, FALSE);
-    
-        if (FileExists(filename))
+        status = CreateNativeProcess(filename, us.Buffer, &hProcess);
+        if (NT_SUCCESS(status))
         {
-          RtlInitAnsiString(&as, Command);
-          RtlAnsiStringToUnicodeString(&us, &as, TRUE);
-                             
-          NtClose(hKeyboard);
-
-          CreateNativeProcess(filename, us.Buffer, &hProcess);
-
-          RtlFreeUnicodeString(&us);
-
           NtWaitForSingleObject(hProcess, FALSE, NULL);
-                    
-          RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
-        } else
-        {
-          RtlCliDisplayString("%s not recognized\n"
-              "Add .exe if you want to lauch executable file."
-              "\nType \"help\" for the list of commands.\n", Command);
-        }        
+        } else {
+          RtlCliDisplayString("Failed to execute %s\n", Command);
+        }
+        RtlCliOpenInputDevice(&hKeyboard, KeyboardType);
+        RtlFreeUnicodeString(&us);
+      } else
+      {
+        RtlCliDisplayString("%s is not recognized as a command or an executable file name\n"
+            "\nType \"help\" for the list of commands.\n", Command);
+      }        
     }
 }
 
@@ -379,21 +398,18 @@ VOID
 RtlClipDisplayPrompt(VOID)
 {
     WCHAR CurrentDirectory[MAX_PATH];
-    ULONG DirSize;
     UNICODE_STRING DirString;
 
-    //
-    // Get the current directory
-    //
-    DirSize = RtlCliGetCurrentDirectory(CurrentDirectory) / sizeof(WCHAR);
+    RtlCliGetCurrentDirectory(CurrentDirectory);
 
-    //
-    // Display it
-    //
-    CurrentDirectory[DirSize] = L'>';
-    CurrentDirectory[DirSize + 1] = UNICODE_NULL;
-    RtlInitUnicodeString(&DirString, CurrentDirectory);
+    if (!RtlDosPathNameToNtPathName_U(CurrentDirectory, &DirString, NULL, NULL))
+    {
+      RtlCliDisplayString("%S>", CurrentDirectory);
+      return;
+    }
+
     RtlCliPrintString(&DirString);
+    RtlCliPutChar(L'>');
 }
 
 /*++
@@ -452,27 +468,27 @@ main(INT argc,
     //
     while (TRUE)
     {
-        //
+
         // Get the line that was entered and display a new line
-        //
+
         Command = RtlCliGetLine(hKeyboard);
         RtlCliDisplayString("\n");
 
-        //
+
         // Make sure there's actually a command
-        //
+
         if (*Command)
         {
-            //
+    
             // Process the command and do a new line again.
-            //
+    
             RtlClipProcessMessage(Command);
             RtlCliDisplayString("\n");
         }
 
-        //
+
         // Display the prompt, and restart the loop
-        //
+
         RtlClipDisplayPrompt();
         continue;
     }
